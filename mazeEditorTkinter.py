@@ -13,13 +13,24 @@ class MazeEditor(tk.Tk):
         self.maze_matrix = [[0 for _ in range(self.grid_width)] for _ in range(self.grid_height)]
         self.canvas = tk.Canvas(self, width=self.canvas_width, height=self.canvas_height, bg="white")
         self.canvas.pack()
-        self.canvas.bind("<B1-Motion>", self.draw)
         self.old_x = None
         self.old_y = None
+        # Buttons
+        self.button_draw = tk.Button(self, text="Draw Obstacle", command=self.draw_mode)
+        self.button_draw.pack()
         self.button_export = tk.Button(self, text="Export Maze", command=self.export_maze)
-        self.button_clear = tk.Button(self, text="Clear Maze", command=self.clear_maze)
         self.button_export.pack()
+        self.button_clear = tk.Button(self, text="Clear Maze", command=self.clear_maze)
         self.button_clear.pack()
+
+    def draw_mode(self):
+        self.canvas.bind("<B1-Motion>", self.draw)
+
+    def place_start_mode(self):
+        self.canvas.bind("<Button-1>", self.place_start)
+
+    def place_finish_mode(self):
+        self.canvas.bind("<Button-1>", self.place_finish)
 
     def draw(self, event):
         x = event.x // self.cell_size
@@ -34,18 +45,18 @@ class MazeEditor(tk.Tk):
                 fill="black"
             )
 
+    # def place_start(self, event):
+    #
+    # def place_finish(self, event):
+
     def export_maze(self):
         for row in self.maze_matrix:
             print(row)
 
     def clear_maze(self):
         print("cleared")
-        self.canvas = tk.Canvas(self, width=self.canvas_width, height=self.canvas_height, bg="white")
-        self.canvas.bind()
-        for row in self.maze_matrix:
-            for i in row:
-                print(i)
-            print(row)
+        self.canvas.delete("all")
+        self.maze_matrix = [[0 for _ in range(self.grid_width)] for _ in range(self.grid_height)]
 
 
 if __name__ == "__main__":
