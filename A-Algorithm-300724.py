@@ -1,5 +1,6 @@
 # A* Algorithm
 # date created: 30th July
-# author:
+# author: Teresa Chhabra and Dominique Gerrard
+# SLAYYYYyyy
 
 # imports
