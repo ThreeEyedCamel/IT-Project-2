@@ -23,6 +23,7 @@ class MazeEditor(tk.Tk):
 
         self.old_x = None
         self.old_y = None
+
         # Start and finish coordinates
         self.start_coords = [-1, -1]
         self.finish_coords = [-1, -1]
@@ -57,7 +58,6 @@ class MazeEditor(tk.Tk):
         file_menu_drop = OptionMenu(self, self.variable, *file_menu_options)
         file_menu_drop.pack(side="right")
 
-
     def create_matrix(self, matrix_width, matrix_height):
         print("create matrix")
         self.maze_matrix = [[0 for _ in range(matrix_width)] for _ in range(matrix_height)]
@@ -88,23 +88,76 @@ class MazeEditor(tk.Tk):
 
     def draw_mode(self):
         print("draw mode")
-        self.canvas.bind("<B1-Motion>", self.draw)
-        self.canvas.bind("<Button-1>", self.draw)
+        if self.button_draw.config('relief')[-1] == 'sunken':
+            self.button_draw.config(relief="raised")
+            self.canvas.unbind("<B1-Motion>")
+            self.canvas.unbind("<Button-1>")
+
+        else:
+            self.raise_all_buttons()
+            self.button_draw.config(relief="sunken")
+            self.canvas.bind("<B1-Motion>", self.draw)
+            self.canvas.bind("<Button-1>", self.draw)
 
     def place_start_mode(self):
         print("place start mode")
-        self.canvas.bind("<Button-1>", self.place_start)
-        self.canvas.unbind("<B1-Motion>")
+        if self.button_place_start.config('relief')[-1] == 'sunken':
+            self.button_place_start.config(relief="raised")
+            self.canvas.unbind("<B1-Motion>")
+            self.canvas.unbind("<Button-1>")
+
+        else:
+            self.raise_all_buttons()
+            self.button_place_start.config(relief="sunken")
+            self.canvas.bind("<B1-Motion>", self.place_start)
+            self.canvas.bind("<Button-1>", self.place_start)
 
     def place_finish_mode(self):
         print("place finish mode")
-        self.canvas.bind("<Button-1>", self.place_finish)
-        self.canvas.unbind("<B1-Motion>")
+        if self.button_place_finish.config('relief')[-1] == 'sunken':
+            self.button_place_finish.config(relief="raised")
+            self.canvas.unbind("<B1-Motion>")
+            self.canvas.unbind("<Button-1>")
+
+        else:
+            self.raise_all_buttons()
+            self.button_place_finish.config(relief="sunken")
+            self.canvas.bind("<B1-Motion>", self.place_finish)
+            self.canvas.bind("<Button-1>", self.place_finish)
 
     def erase_mode(self):
         print("erase mode")
-        self.canvas.bind("<B1-Motion>", self.erase)
-        self.canvas.bind("<Button-1>", self.erase)
+        if self.button_erase.config('relief')[-1] == 'sunken':
+            self.button_erase.config(relief="raised")
+            self.canvas.unbind("<B1-Motion>")
+            self.canvas.unbind("<Button-1>")
+
+        else:
+            self.raise_all_buttons()
+            self.button_erase.config(relief="sunken")
+            self.canvas.bind("<B1-Motion>", self.erase)
+            self.canvas.bind("<Button-1>", self.erase)
+
+    def button_modes_template(self, button, function):
+        """"
+        Honestly this one is kinda useless.
+        """
+        if button.config('relief')[-1] == 'sunken':
+            button.config(relief="raised")
+            self.canvas.unbind("<B1-Motion>")
+            self.canvas.unbind("<Button-1>")
+
+        else:
+            self.raise_all_buttons()
+            button.config(relief="sunken")
+            self.canvas.bind("<B1-Motion>", function)
+            self.canvas.bind("<Button-1>", function)
+
+    def raise_all_buttons(self):
+        self.button_draw.config(relief="raised")
+        self.button_place_start.config(relief="raised")
+        self.button_place_finish.config(relief="raised")
+        self.button_erase.config(relief="raised")
 
     def draw(self, event):
         x = event.x // self.cell_size
