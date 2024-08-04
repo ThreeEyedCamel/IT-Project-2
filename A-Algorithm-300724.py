@@ -7,37 +7,48 @@
 # Imports
 
 class Cell():
-    def _init_ (self):
+    def _init_(self):
         # NOTE:THIS IS DIRECTLY FROM G4G AS I DONT KNOW HOW TO REWRITE IT
         # this seems to be the universal way to declare so maybe we can change the names really - renamed
-        self.p_row = 0 # Parent cell's row index
-        self.p_column = 0 # Parent cell's column index
-        self.t_cost = float('inf') # Total cost of the cell (g + h)
-        self.s_cost = float('inf') # Cost from start to this cell
-        self.h_cost = 0 # Heuristic cost from this cell to destination
+        self.p_row = 0  # Parent cell's row index
+        self.p_column = 0  # Parent cell's column index
+        self.t_cost = float('inf')  # Total cost of the cell (g + h)
+        self.s_cost = float('inf')  # Cost from start to this cell
+        self.h_cost = 0  # Heuristic cost from this cell to destination
+
+
 GRID_ROWS = 0
 GRID_COLUMNS = 0
 
+
 # Custom set the grid size - call this function after acquiring user input
 def grid_size(rows, columns):
+    # global GRID_ROWS, GRID_COLUMNS = rows, columns # do not necessarily need to have global, but allows us to change the value later
     GRID_ROWS, GRID_COLUMNS = rows, columns
+
 
 # Check if the cell is within the grid - returns boolean
 def valid(row, column):
-    return {(column>0) and (column<GRID_COLUMNS)and (row>0)and(row<GRID_ROWS)}
+    return {(column > 0) and (column < GRID_COLUMNS) and (row > 0) and (row < GRID_ROWS)}
+
 
 # Checks if the destination can be accessed - returns boolean
 def unblocked(grid, row, column):
     return grid[row][column] == 0
 
+
 # Checks if we have reached the destination
 def destination_reached(row, column, destination):
-    return destination[0] == row and destination[1]== column
+    return destination[0] == row and destination[1] == column
+
 
 """###################⬇️ TO DO ⬇️#####################"""
+
+
 # Yet to decide on our H value calculation method
 def h_value(row, column, destination):
     print("H value function")
+
 
 # Not 100% sure how to do this yet
 """
@@ -47,9 +58,13 @@ Formats the path
 
 NOTE: Cell details should loop through each cell in the grid and call the Cell function for each one
 """
+
+
 def trace_path(destination, cell_details):
     print("Trace path function")
 
+
+# h_value needs to be called here but for now can comment out
 # Insert the A star function here
 """
 Implements the actual A* algorithm by: 
@@ -67,8 +82,11 @@ Loop over the algorithm:
     If this new cell has the lowest value - add it to the list we want it 
 If we cant find the destination - give an unsuccessful message 
 """
-def a_star():
+
+
+def a_star(grid, source, destination, row, column):
     print("A star function")
+
 
 # Main function
 """
@@ -76,6 +94,13 @@ def a_star():
     Define the source and destination - use user input
     Run the algorithm by calling a_star
 """
+
+
+# trace_path needs to be called here but for now can comment out
 def main():
-    print("Main function")
-    
+    print("Main function")  # testing purposes
+    # defining the grid using user input - text based atm
+    rows = int(input("why hello enter rows in grid: "))
+    columns = int(input("enter columns in grid: "))
+    print(
+        "enter grid - 0 for free cell, 1 for obstacle cell, 2 for ..., 3 for ...")  # number allocations for what does what, double check with group charter
