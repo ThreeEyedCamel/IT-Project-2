@@ -1,7 +1,7 @@
 # A* Algorithm
 # Date created: 30th July
-# Modification date:3rd August(Nicky)
-# Author/s: Teresa Chhabra and Dominique(Nicky) Gerrard
+# Modification date: 3rd August Nicky
+# Author/s: Teresa Chhabra and Nicky Gerrard
 # SLAYYYYyyy
 
 # Imports
