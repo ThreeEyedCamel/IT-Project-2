@@ -44,9 +44,10 @@ def destination_reached(row, column, destination):
 
 """###################⬇️ TO DO ⬇️#####################"""
 
-
+##NICKY TO DO
 # Yet to decide on our H value calculation method
 def h_value(row, column, destination):
+    
     print("H value function")
 
 
@@ -59,7 +60,7 @@ Formats the path
 NOTE: Cell details should loop through each cell in the grid and call the Cell function for each one
 """
 
-
+## NICKY TO DO
 def trace_path(destination, cell_details):
     print("Trace path function")
 
@@ -83,7 +84,7 @@ Loop over the algorithm:
 If we cant find the destination - give an unsuccessful message 
 """
 
-
+## TERESA TO DO
 def a_star(grid, source, destination, row, column):
     print("A star function")
 
@@ -95,9 +96,9 @@ def a_star(grid, source, destination, row, column):
     Run the algorithm by calling a_star
 """
 
-
+##TERESA TO DO
 # trace_path needs to be called here but for now can comment out
-def main():
+def main(): 
     print("Main function")  # testing purposes
     # defining the grid using user input - text based atm
     rows = int(input("why hello enter rows in grid: "))
