@@ -2,7 +2,7 @@
 # Date created: 30th July
 # Modification date: 3rd August Nicky, 4th August
 # Author/s: Teresa Chhabra and Nicky Gerrard
-# SLAYYYYyyyYYYY
+# SLAYYYYyyyYYYYyyyy
 
 # Imports
 
