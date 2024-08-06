@@ -1,6 +1,6 @@
 # A* Algorithm
 # Date created: 30th July
-# Modification date: 3rd August Nicky, 4th August
+# Modification date:3rd August Nicky, 4th August Teresa, 6th August Nicky 
 # Author/s: Teresa Chhabra and Nicky Gerrard
 # SLAYYYYyyyYYYYyyyy
 
