@@ -50,6 +50,10 @@ class MazeEditor(tk.Tk):
         self.button_import = tk.Button(self, text="Import Matrix From File", command=self.import_maze)
         self.button_import.pack(side="right")
 
+        # Test button
+        self.button_test = tk.Button(self, text="test", command=self.animate_path_test)
+        self.button_test.pack(side="left")
+
         # Drop-down menu
         file_menu_options = os.listdir(os.getcwd() + "/savedCourses")
 
@@ -139,7 +143,7 @@ class MazeEditor(tk.Tk):
             self.canvas.bind("<Button-1>", self.erase)
 
     def button_modes_template(self, button, function):
-        """"
+        """
         Honestly this one is kinda useless.
         """
         if button.config('relief')[-1] == 'sunken':
@@ -249,15 +253,48 @@ class MazeEditor(tk.Tk):
         self.canvas.delete("all")
         self.initialise_canvas()
 
-    def update_path(self, x, y):
-        print(f"Update cell ({x},{y})")
-        self.canvas.create_rectangle(
-            x * self.cell_size,
-            y * self.cell_size,
-            (x + 1) * self.cell_size,
-            (y + 1) * self.cell_size,
-            fill="grey", outline="grey"
-        )
+    def update_path(self, coordinates):
+        print(f"Update cell ({coordinates})")
+        self.canvas.create_rectangle(coordinates[0] * self.cell_size,
+                                     coordinates[1] * self.cell_size,
+                                     (coordinates[0] + 1) * self.cell_size,
+                                     (coordinates[1] + 1) * self.cell_size,
+                                     fill="grey", outline="grey"
+                                     )
+
+    def update_searched(self, coordinates):
+        print(f"Searched cell ({coordinates})")
+        self.canvas.create_rectangle(coordinates[0] * self.cell_size,
+                                     coordinates[1] * self.cell_size,
+                                     (coordinates[0] + 1) * self.cell_size,
+                                     (coordinates[1] + 1) * self.cell_size,
+                                     fill="cyan", outline="cyan"
+                                     )
+
+    def animate_moves(self, moveset, index=0):
+        print(f"animate move {moveset[index]}")
+        print(f"index={index}")
+        if index < len(moveset):
+            self.update_path(moveset[index])
+            # self.animate_views(viewset, index)
+        self.after(500, self.animate_moves, moveset, index + 1)
+
+    def animate_views(self, viewset, index=0, subindex=0):
+        print(f"animate view {viewset[index][subindex]}")
+        if subindex < len(viewset[index]):
+            self.update_searched(viewset[index][subindex])
+
+        self.after(500, self.animate_views, viewset, subindex + 1)
+
+    def animate_path_test(self):
+        moveset = [[2, 2], [2, 3], [2, 4], [2, 5]]
+        viewset = [
+            [[3, 2], [2, 3]],
+            [[1, 3], [2, 4]],
+            [[3, 4], [2, 5]],
+            [[1, 5], [2, 6]]
+        ]
+        self.animate_moves(moveset)
 
 
 if __name__ == "__main__":
