@@ -51,8 +51,8 @@ class MazeEditor(tk.Tk):
         self.button_import.pack(side="right")
 
         # Test button
-        self.button_test = tk.Button(self, text="test", command=self.animate_path_test)
-        self.button_test.pack(side="left")
+        self.button_test_animation = tk.Button(self, text="test animation", command=self.animate_path_test)
+        self.button_test_animation.pack(side="left")
 
         # Drop-down menu
         file_menu_options = os.listdir(os.getcwd() + "/savedCourses")
@@ -167,6 +167,11 @@ class MazeEditor(tk.Tk):
         x = event.x // self.cell_size
         y = event.y // self.cell_size
         if 0 <= x < self.grid_width + 2 and 0 <= y < self.grid_height + 2:
+            # Reset start/finish coords
+            if self.maze_matrix[y][x] == 2:
+                self.start_coords = [-1, -1]
+            if self.maze_matrix[y][x] == 3:
+                self.finish_coords = [-1, -1]
             self.maze_matrix[y][x] = 1
             self.canvas.create_rectangle(
                 x * self.cell_size,
@@ -174,6 +179,24 @@ class MazeEditor(tk.Tk):
                 (x + 1) * self.cell_size,
                 (y + 1) * self.cell_size,
                 fill="black"
+            )
+
+    def erase(self, event):
+        x = event.x // self.cell_size
+        y = event.y // self.cell_size
+        if 1 <= x < self.grid_width + 1 and 1 <= y < self.grid_height + 1:
+            # Reset start/finish coords
+            if self.maze_matrix[y][x] == 2:
+                self.start_coords = [-1, -1]
+            if self.maze_matrix[y][x] == 3:
+                self.finish_coords = [-1, -1]
+            self.maze_matrix[y][x] = 0
+            self.canvas.create_rectangle(
+                x * self.cell_size,
+                y * self.cell_size,
+                (x + 1) * self.cell_size,
+                (y + 1) * self.cell_size,
+                fill="white", outline="white"
             )
 
     def place_start(self, event):
@@ -207,24 +230,6 @@ class MazeEditor(tk.Tk):
                     fill="red"
                 )
                 print(self.finish_coords)
-
-    def erase(self, event):
-        x = event.x // self.cell_size
-        y = event.y // self.cell_size
-        if 1 <= x < self.grid_width + 1 and 1 <= y < self.grid_height + 1:
-            # Reset start/finish coords
-            if self.maze_matrix[y][x] == 2:
-                self.start_coords = [-1, -1]
-            if self.maze_matrix[y][x] == 3:
-                self.finish_coords = [-1, -1]
-            self.maze_matrix[y][x] = 0
-            self.canvas.create_rectangle(
-                x * self.cell_size,
-                y * self.cell_size,
-                (x + 1) * self.cell_size,
-                (y + 1) * self.cell_size,
-                fill="white", outline="white"
-            )
 
     def export_maze(self):
         with open("savedCourses/maze.txt", "w") as maze_file:
@@ -271,22 +276,47 @@ class MazeEditor(tk.Tk):
                                      fill="cyan", outline="cyan"
                                      )
 
-    def animate_moves(self, moveset, index=0):
-        print(f"animate move {moveset[index]}")
-        print(f"index={index}")
+    def animate_moves(self, moveset, viewset, index=0):
+        """
+        Animates the 'path' of the agent in grey.
+
+        :param moveset: List of two-integer lists representing coordinates visited by agent
+        :type moveset: list[list[int]]
+        :param viewset: For every move: list of two-integer lists representing coordinates viewed by agent
+        :type viewset: list[list[list[int]]]
+        :param index: Counter
+        :type index: int
+        :return: None
+        """
+        print(f"animate move {moveset[index]}, index={index}")
         if index < len(moveset):
             self.update_path(moveset[index])
-            # self.animate_views(viewset, index)
-        self.after(500, self.animate_moves, moveset, index + 1)
+            self.after(500, self.animate_views, viewset, index)
+        # Cheeky way to make sure the next move waits
+        self.after(500 * (1 + len(viewset[index])), self.animate_moves, moveset, viewset, index + 1)
 
-    def animate_views(self, viewset, index=0, subindex=0):
-        print(f"animate view {viewset[index][subindex]}")
+    def animate_views(self, viewset, index, subindex=0):
+        """
+        Animates the 'searched' areas of the agent in grey.
+
+        :param viewset: For every move: list of two-integer lists representing coordinates viewed by agent
+        :type viewset: list[list[list[int]]]
+        :param index: References the move that applies to the corresponding viewset
+        :type index: int
+        :param subindex: References coordinate pairs within viewset
+        :type subindex: int
+        :return: None
+        """
+        print(f"animate view {viewset[index][subindex]}, index={index}, subindex={subindex}")
         if subindex < len(viewset[index]):
             self.update_searched(viewset[index][subindex])
-
-        self.after(500, self.animate_views, viewset, subindex + 1)
+        self.after(500, self.animate_views, viewset, index, subindex + 1)
 
     def animate_path_test(self):
+        """
+        Test function containing sample move/viewset
+
+        """
         moveset = [[2, 2], [2, 3], [2, 4], [2, 5]]
         viewset = [
             [[3, 2], [2, 3]],
@@ -294,7 +324,7 @@ class MazeEditor(tk.Tk):
             [[3, 4], [2, 5]],
             [[1, 5], [2, 6]]
         ]
-        self.animate_moves(moveset)
+        self.animate_moves(moveset, viewset)
 
 
 if __name__ == "__main__":
