@@ -14,6 +14,7 @@ class MazeEditor(tk.Tk):
         self.cell_size = 20
         self.canvas_width = (self.grid_width + 2) * self.cell_size
         self.canvas_height = (self.grid_height + 2) * self.cell_size
+        self.animation_delay = 500
         # Initialise matrix
         self.maze_matrix = None
         self.create_matrix(self.grid_width, self.grid_height)
@@ -73,23 +74,23 @@ class MazeEditor(tk.Tk):
 
         self.button_erase = tk.Button(self.button_frame, image=self.eraser_image, command=self.erase_mode)
         self.button_erase.grid(row=0, column=3, padx=5, pady=5)
-        self.button_label_erase = tk.Label(self.button_frame, text="Erase")
-        self.button_label_erase.grid(row=1, column=3)
+        self.button_erase_label = tk.Label(self.button_frame, text="Erase")
+        self.button_erase_label.grid(row=1, column=3)
 
         self.button_export = tk.Button(self.button_frame, image=self.export_image, command=self.export_maze)
         self.button_export.grid(row=0, column=4, padx=5, pady=5)
-        self.export_label = tk.Label(self.button_frame, text="Export Maze")
-        self.export_label.grid(row=1, column=4)
+        self.button_export_label = tk.Label(self.button_frame, text="Export Maze")
+        self.button_export_label.grid(row=1, column=4)
 
         self.button_clear = tk.Button(self.button_frame, image=self.clear_image, command=self.clear_maze)
         self.button_clear.grid(row=0, column=5, padx=5, pady=5)
-        self.clear_label = tk.Label(self.button_frame, text="Clear Maze")
-        self.clear_label.grid(row=1, column=5)
+        self.button_clear_label = tk.Label(self.button_frame, text="Clear Maze")
+        self.button_clear_label.grid(row=1, column=5)
 
         self.button_import = tk.Button(self.button_frame, image=self.import_image, command=self.import_maze)
         self.button_import.grid(row=0, column=6, padx=5, pady=5)
-        self.import_label = tk.Label(self.button_frame, text="Import Matrix")
-        self.import_label.grid(row=1, column=6)
+        self.button_import_label = tk.Label(self.button_frame, text="Import Matrix")
+        self.button_import_label.grid(row=1, column=6)
 
         self.button_test_animation = tk.Button(self.button_frame, text="Test Animation", command=self.animate_path_test)
         self.button_test_animation.grid(row=0, column=7, padx=5, pady=5)
@@ -201,6 +202,28 @@ class MazeEditor(tk.Tk):
         self.button_place_start.config(relief="raised")
         self.button_place_finish.config(relief="raised")
         self.button_erase.config(relief="raised")
+
+    def disable_buttons(self):
+        print("disable buttons")
+        self.button_draw.config(state=tk.DISABLED)
+        self.button_erase.config(state=tk.DISABLED)
+        self.button_place_finish.config(state=DISABLED)
+        self.button_place_start.config(state=DISABLED)
+        self.button_clear.config(state=DISABLED)
+        self.button_import.config(state=DISABLED)
+        self.button_export.config(state=DISABLED)
+        self.button_test_animation.config(state=DISABLED)
+
+    def enable_buttons(self):
+        print("enable buttons")
+        self.button_draw.config(state=tk.NORMAL)
+        self.button_erase.config(state=tk.NORMAL)
+        self.button_place_finish.config(state=NORMAL)
+        self.button_place_start.config(state=NORMAL)
+        self.button_clear.config(state=NORMAL)
+        self.button_import.config(state=NORMAL)
+        self.button_export.config(state=NORMAL)
+        self.button_test_animation.config(state=NORMAL)
 
     def draw(self, event):
         x = event.x // self.cell_size
@@ -332,7 +355,7 @@ class MazeEditor(tk.Tk):
             self.update_path(moveset[index])
             self.after(500, self.animate_views, viewset, index)
         # Cheeky way to make sure the next move waits
-        self.after(500 * (1 + len(viewset[index])), self.animate_moves, moveset, viewset, index + 1)
+        self.after(self.animation_delay * (1 + len(viewset[index])), self.animate_moves, moveset, viewset, index + 1)
 
     def animate_views(self, viewset, index, subindex=0):
         """
@@ -349,13 +372,14 @@ class MazeEditor(tk.Tk):
         print(f"animate view {viewset[index][subindex]}, index={index}, subindex={subindex}")
         if subindex < len(viewset[index]):
             self.update_searched(viewset[index][subindex])
-        self.after(500, self.animate_views, viewset, index, subindex + 1)
+        self.after(self.animation_delay, self.animate_views, viewset, index, subindex + 1)
 
     def animate_path_test(self):
         """
         Test function containing sample move/viewset
 
         """
+        self.disable_buttons()
         moveset = [[2, 2], [2, 3], [2, 4], [2, 5]]
         viewset = [
             [[3, 2], [2, 3]],
@@ -364,6 +388,12 @@ class MazeEditor(tk.Tk):
             [[1, 5], [2, 6]]
         ]
         self.animate_moves(moveset, viewset)
+        viewset_length = 0
+        for i in range(len(viewset)):
+            for _ in viewset[i]:
+                viewset_length += 1
+
+        self.after(self.animation_delay * (1 + len(moveset) + viewset_length), self.enable_buttons)
 
 
 if __name__ == "__main__":
