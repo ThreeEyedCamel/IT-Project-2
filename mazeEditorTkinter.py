@@ -18,8 +18,13 @@ class MazeEditor(tk.Tk):
         self.maze_matrix = None
         self.create_matrix(self.grid_width, self.grid_height)
         # Initialise canvas
-        self.canvas = tk.Canvas(self, width=self.canvas_width, height=self.canvas_height, bg="white")
+        self.background_image = Image.open(r"icons/background.png").resize(
+            (self.canvas_width, self.canvas_height))  # Resize to canvas size
+        self.background_image = ImageTk.PhotoImage(self.background_image)
+        self.canvas = tk.Canvas(self, width=self.canvas_width, height=self.canvas_height)
         self.canvas.pack()
+        # Set the background image on the canvas
+        self.canvas.create_image(0, 0, image=self.background_image, anchor="nw")
         self.initialise_canvas()
 
         self.old_x = None
@@ -217,7 +222,8 @@ class MazeEditor(tk.Tk):
                 y * self.cell_size,
                 (x + 1) * self.cell_size,
                 (y + 1) * self.cell_size,
-                fill="black"
+                fill="black",
+                tags= (f"cell_{x}_{y}", 'maze')
             )
 
     def erase(self, event):
@@ -230,13 +236,8 @@ class MazeEditor(tk.Tk):
             if self.maze_matrix[y][x] == 3:
                 self.finish_coords = [-1, -1]
             self.maze_matrix[y][x] = 0
-            self.canvas.create_rectangle(
-                x * self.cell_size,
-                y * self.cell_size,
-                (x + 1) * self.cell_size,
-                (y + 1) * self.cell_size,
-                fill="white", outline="white"
-            )
+            self.canvas.delete(f"cell_{x}_{y}")
+
 
     def place_start(self, event):
         if (self.start_coords[0] < 0) and (self.start_coords[1] < 0):
@@ -250,7 +251,8 @@ class MazeEditor(tk.Tk):
                     y * self.cell_size,
                     (x + 1) * self.cell_size,
                     (y + 1) * self.cell_size,
-                    fill="green"
+                    fill="green",
+                    tags=(f"cell_{x}_{y}",'maze')
                 )
                 print(self.start_coords)
 
@@ -266,7 +268,8 @@ class MazeEditor(tk.Tk):
                     y * self.cell_size,
                     (x + 1) * self.cell_size,
                     (y + 1) * self.cell_size,
-                    fill="red"
+                    fill="red",
+                    tags=(f"cell_{x}_{y}",'maze')
                 )
                 print(self.finish_coords)
 
@@ -279,7 +282,7 @@ class MazeEditor(tk.Tk):
     def clear_maze(self):
         print("cleared")
         self.create_matrix(self.grid_width, self.grid_height)
-        self.canvas.delete("all")
+        self.canvas.delete("maze")
         self.initialise_canvas()
         self.start_coords = [-1, -1]
         self.finish_coords = [-1, -1]
