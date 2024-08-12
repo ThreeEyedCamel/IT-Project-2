@@ -47,7 +47,7 @@ class MazeEditor(tk.Tk):
         self.button_clear = tk.Button(self, text="Clear Maze", command=self.clear_maze)
         self.button_clear.pack(side="right")
 
-        self.button_import = tk.Button(self, text="Import Maze From File", command=self.import_maze)
+        self.button_import = tk.Button(self, text="Import Matrix From File", command=self.import_maze)
         self.button_import.pack(side="right")
 
         # Test button
