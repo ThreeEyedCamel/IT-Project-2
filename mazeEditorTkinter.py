@@ -18,8 +18,13 @@ class MazeEditor(tk.Tk):
         self.maze_matrix = None
         self.create_matrix(self.grid_width, self.grid_height)
         # Initialise canvas
-        self.canvas = tk.Canvas(self, width=self.canvas_width, height=self.canvas_height, bg="white")
+        self.background_image = Image.open(r"icons/background.png").resize(
+            (self.canvas_width, self.canvas_height))  # Resize to canvas size
+        self.background_image = ImageTk.PhotoImage(self.background_image)
+        self.canvas = tk.Canvas(self, width=self.canvas_width, height=self.canvas_height)
         self.canvas.pack()
+        # Set the background image on the canvas
+        self.canvas.create_image(0, 0, image=self.background_image, anchor="nw")
         self.initialise_canvas()
 
         self.old_x = None
@@ -30,76 +35,76 @@ class MazeEditor(tk.Tk):
         self.finish_coords = [-1, -1]
 
         # Images
-        self.brush_image = Image.open(r"images/paintbrush.png").resize((32, 32))
-        self.brush_image = ImageTk.PhotoImage(self.brush_image)
+        self.draw_icon = Image.open(r"icons/paintbrush.png").resize((32, 32))
+        self.draw_icon = ImageTk.PhotoImage(self.draw_icon)
 
-        self.export_image = Image.open(r"images/export.png").resize((32, 32))
-        self.export_image = ImageTk.PhotoImage(self.export_image)
+        self.export_icon = Image.open(r"icons/export.png").resize((32, 32))
+        self.export_icon = ImageTk.PhotoImage(self.export_icon)
 
-        self.clear_image = Image.open(r"images/trash.png").resize((32, 32))
-        self.clear_image = ImageTk.PhotoImage(self.clear_image)
+        self.clear_icon = Image.open(r"icons/trash.png").resize((32, 32))
+        self.clear_icon = ImageTk.PhotoImage(self.clear_icon)
 
-        self.eraser_image = Image.open(r"images/eraser.png").resize((32, 32))
-        self.eraser_image = ImageTk.PhotoImage(self.eraser_image)
+        self.eraser_icon = Image.open(r"icons/eraser.png").resize((32, 32))
+        self.eraser_icon = ImageTk.PhotoImage(self.eraser_icon)
 
-        self.finish_image = Image.open(r"images/finish.png").resize((32, 32))
-        self.finish_image = ImageTk.PhotoImage(self.finish_image)
+        self.finish_icon = Image.open(r"icons/finish.png").resize((32, 32))
+        self.finish_icon = ImageTk.PhotoImage(self.finish_icon)
 
-        self.start_image = Image.open(r"images/start.png").resize((32, 32))
-        self.start_image = ImageTk.PhotoImage(self.start_image)
+        self.start_icon = Image.open(r"icons/start.png").resize((32, 32))
+        self.start_icon = ImageTk.PhotoImage(self.start_icon)
 
-        self.import_image = Image.open(r"images/import.png").resize((32, 32))
-        self.import_image = ImageTk.PhotoImage(self.import_image)
+        self.import_icon = Image.open(r"icons/import.png").resize((32, 32))
+        self.import_icon = ImageTk.PhotoImage(self.import_icon)
 
         # Create a frame at the bottom of the window for buttons and labels
         self.button_frame = tk.Frame(self)
         self.button_frame.pack(side="bottom", fill="x")
 
         # Buttons and labels in a grid layout
-        self.button_draw = tk.Button(self.button_frame, image=self.brush_image, command=self.draw_mode)
+        self.button_draw = tk.Button(self.button_frame, image=self.draw_icon, command=self.draw_mode)
         self.button_draw.grid(row=0, column=0, padx=5, pady=5)
         self.button_label_draw = tk.Label(self.button_frame, text="Draw Obstacle")
         self.button_label_draw.grid(row=1, column=0)
 
-        self.button_place_start = tk.Button(self.button_frame, image=self.start_image, command=self.place_start_mode)
+        self.button_place_start = tk.Button(self.button_frame, image=self.start_icon, command=self.place_start_mode)
         self.button_place_start.grid(row=0, column=1, padx=5, pady=5)
         self.button_label_start = tk.Label(self.button_frame, text="Place Start")
         self.button_label_start.grid(row=1, column=1)
 
-        self.button_place_finish = tk.Button(self.button_frame, image=self.finish_image, command=self.place_finish_mode)
+        self.button_place_finish = tk.Button(self.button_frame, image=self.finish_icon, command=self.place_finish_mode)
         self.button_place_finish.grid(row=0, column=2, padx=5, pady=5)
         self.button_label_finish = tk.Label(self.button_frame, text="Place Finish")
         self.button_label_finish.grid(row=1, column=2)
 
-        self.button_erase = tk.Button(self.button_frame, image=self.eraser_image, command=self.erase_mode)
+        self.button_erase = tk.Button(self.button_frame, image=self.eraser_icon, command=self.erase_mode)
         self.button_erase.grid(row=0, column=3, padx=5, pady=5)
         self.button_label_erase = tk.Label(self.button_frame, text="Erase")
         self.button_label_erase.grid(row=1, column=3)
 
-        self.button_export = tk.Button(self.button_frame, image=self.export_image, command=self.export_maze)
-        self.button_export.grid(row=0, column=4, padx=5, pady=5)
+        self.button_export = tk.Button(self.button_frame, image=self.export_icon, command=self.export_maze)
+        self.button_export.grid(row=0, column=5, padx=5, pady=5)
         self.export_label = tk.Label(self.button_frame, text="Export Maze")
-        self.export_label.grid(row=1, column=4)
+        self.export_label.grid(row=1, column=5)
 
-        self.button_clear = tk.Button(self.button_frame, image=self.clear_image, command=self.clear_maze)
-        self.button_clear.grid(row=0, column=5, padx=5, pady=5)
+        self.button_clear = tk.Button(self.button_frame, image=self.clear_icon, command=self.clear_maze)
+        self.button_clear.grid(row=0, column=4, padx=5, pady=5)
         self.clear_label = tk.Label(self.button_frame, text="Clear Maze")
-        self.clear_label.grid(row=1, column=5)
+        self.clear_label.grid(row=1, column=4)
 
-        self.button_import = tk.Button(self.button_frame, image=self.import_image, command=self.import_maze)
+        self.button_import = tk.Button(self.button_frame, image=self.import_icon, command=self.import_maze)
         self.button_import.grid(row=0, column=6, padx=5, pady=5)
         self.import_label = tk.Label(self.button_frame, text="Import Matrix")
         self.import_label.grid(row=1, column=6)
 
         self.button_test_animation = tk.Button(self.button_frame, text="Test Animation", command=self.animate_path_test)
-        self.button_test_animation.grid(row=0, column=7, padx=5, pady=5)
+        self.button_test_animation.grid(row=0, column=8, padx=5, pady=5)
 
         # Drop-down menu
         file_menu_options = os.listdir(os.getcwd() + "/savedCourses")
         self.variable = StringVar()
         self.variable.set(file_menu_options[0])
         file_menu_drop = OptionMenu(self.button_frame, self.variable, *file_menu_options)
-        file_menu_drop.grid(row=0, column=8, padx=5, pady=5)
+        file_menu_drop.grid(row=0, column=7, padx=5, pady=5)
 
     def create_matrix(self, matrix_width, matrix_height):
         print("create matrix")
@@ -217,7 +222,8 @@ class MazeEditor(tk.Tk):
                 y * self.cell_size,
                 (x + 1) * self.cell_size,
                 (y + 1) * self.cell_size,
-                fill="black"
+                fill="black",
+                tags= (f"cell_{x}_{y}", 'maze')
             )
 
     def erase(self, event):
@@ -230,13 +236,8 @@ class MazeEditor(tk.Tk):
             if self.maze_matrix[y][x] == 3:
                 self.finish_coords = [-1, -1]
             self.maze_matrix[y][x] = 0
-            self.canvas.create_rectangle(
-                x * self.cell_size,
-                y * self.cell_size,
-                (x + 1) * self.cell_size,
-                (y + 1) * self.cell_size,
-                fill="white", outline="white"
-            )
+            self.canvas.delete(f"cell_{x}_{y}")
+
 
     def place_start(self, event):
         if (self.start_coords[0] < 0) and (self.start_coords[1] < 0):
@@ -250,7 +251,8 @@ class MazeEditor(tk.Tk):
                     y * self.cell_size,
                     (x + 1) * self.cell_size,
                     (y + 1) * self.cell_size,
-                    fill="green"
+                    fill="green",
+                    tags=(f"cell_{x}_{y}",'maze')
                 )
                 print(self.start_coords)
 
@@ -266,7 +268,8 @@ class MazeEditor(tk.Tk):
                     y * self.cell_size,
                     (x + 1) * self.cell_size,
                     (y + 1) * self.cell_size,
-                    fill="red"
+                    fill="red",
+                    tags=(f"cell_{x}_{y}",'maze')
                 )
                 print(self.finish_coords)
 
@@ -279,7 +282,7 @@ class MazeEditor(tk.Tk):
     def clear_maze(self):
         print("cleared")
         self.create_matrix(self.grid_width, self.grid_height)
-        self.canvas.delete("all")
+        self.canvas.delete("maze")
         self.initialise_canvas()
         self.start_coords = [-1, -1]
         self.finish_coords = [-1, -1]
