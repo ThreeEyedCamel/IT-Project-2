@@ -6,6 +6,9 @@
 
 # Imports
 
+from math import sqrt
+
+
 class Cell():
     def _init_(self):
         # NOTE:THIS IS DIRECTLY FROM G4G AS I DONT KNOW HOW TO REWRITE IT
@@ -45,10 +48,21 @@ def destination_reached(row, column, destination):
 """###################⬇️ TO DO ⬇️#####################"""
 
 ##NICKY TO DO
-# Yet to decide on our H value calculation method
+# Euclidean 
+"""TODO test"""
 def h_value(row, column, destination):
-    
-    print("H value function")
+    dest_x = destination[0]
+    dest_y = destination[1]
+    # First need to find values of DX and DY
+    #DX is how far away on the X axis the destination is from the current position
+    DX = dest_x - column 
+    #DY is how far away on the Y axis the destination is from the current position
+    DY = dest_y - row
+
+    #H value using euclidean distance
+    H_value = sqrt(DX**2+DY**2)
+
+    print("H value: ", H_value)
 
 
 # Not 100% sure how to do this yet
