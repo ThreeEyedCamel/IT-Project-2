@@ -24,8 +24,7 @@ class MazeEditor(tk.Tk):
         self.background_image = ImageTk.PhotoImage(self.background_image)
         self.canvas = tk.Canvas(self, width=self.canvas_width, height=self.canvas_height)
         self.canvas.pack()
-        # Set the background image on the canvas
-        self.canvas.create_image(0, 0, image=self.background_image, anchor="nw")
+
         self.initialise_canvas()
 
         self.old_x = None
@@ -79,23 +78,23 @@ class MazeEditor(tk.Tk):
 
         self.button_erase = tk.Button(self.button_frame, image=self.eraser_icon, command=self.erase_mode)
         self.button_erase.grid(row=0, column=3, padx=5, pady=5)
-        self.button_erase_label = tk.Label(self.button_frame, text="Erase")
-        self.button_erase_label.grid(row=1, column=3)
+        self.button_label_erase = tk.Label(self.button_frame, text="Erase")
+        self.button_label_erase.grid(row=1, column=3)
 
         self.button_export = tk.Button(self.button_frame, image=self.export_icon, command=self.export_maze)
         self.button_export.grid(row=0, column=5, padx=5, pady=5)
-        self.export_label = tk.Label(self.button_frame, text="Export Maze")
-        self.export_label.grid(row=1, column=5)
+        self.button_label_export = tk.Label(self.button_frame, text="Export Maze")
+        self.button_label_export.grid(row=1, column=5)
 
         self.button_clear = tk.Button(self.button_frame, image=self.clear_icon, command=self.clear_maze)
         self.button_clear.grid(row=0, column=4, padx=5, pady=5)
-        self.button_clear_label = tk.Label(self.button_frame, text="Clear Maze")
-        self.button_clear_label.grid(row=1, column=4)
+        self.button_label_clear = tk.Label(self.button_frame, text="Clear Maze")
+        self.button_label_clear.grid(row=1, column=4)
 
         self.button_import = tk.Button(self.button_frame, image=self.import_icon, command=self.import_maze)
         self.button_import.grid(row=0, column=6, padx=5, pady=5)
-        self.button_import_label = tk.Label(self.button_frame, text="Import Matrix")
-        self.button_import_label.grid(row=1, column=6)
+        self.button_label_import = tk.Label(self.button_frame, text="Import Maze")
+        self.button_label_import.grid(row=1, column=6)
 
         self.button_test_animation = tk.Button(self.button_frame, text="Test Animation", command=self.animate_path_test)
         self.button_test_animation.grid(row=0, column=8, padx=5, pady=5)
@@ -117,7 +116,13 @@ class MazeEditor(tk.Tk):
         self.maze_matrix.insert(0, [1 for _ in range(matrix_width + 2)])
 
     def initialise_canvas(self):
+        """
+        All details of canvas initialisation go in this function
+
+        :return:
+        """
         print("initialise canvas")
+        self.canvas.create_image(0, 0, image=self.background_image, anchor="nw")
         for y in range(len(self.maze_matrix)):
             for x in range(len(self.maze_matrix[0])):
                 square_dims = (x * self.cell_size,
