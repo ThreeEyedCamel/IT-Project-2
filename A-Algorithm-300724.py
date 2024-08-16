@@ -48,7 +48,7 @@ class A_star_functions():
 
     """###################⬇️ TO DO ⬇️#####################"""
 
-    ##NICKY TO DO
+
     # Euclidean 
     """TODO test"""
     def h_value(row, column, destination):
@@ -68,18 +68,36 @@ class A_star_functions():
     h_value(1, 1, [50, 73])
 
 
-    # Not 100% sure how to do this yet
     """
     Traces the path from end destination to the start location using parent cells 
     Goes through 'cell details' and appends each visited space to the path 
     Formats the path
-
+    Effectively, we have already found the shortest path and are now returning it
+    Returns a list of tuples 
     NOTE: Cell details should loop through each cell in the grid and call the Cell function for each one
     """
-
-    ## NICKY TO DO
     def trace_path(destination, cell_details):
-        print("Trace path function")
+        row = destination[0]
+        column = destination[1]
+        path = []
+        #While the current location(cell_details[row][column].parent) is not the destination(row, col)
+        while (cell_details[row][column].parent_i != row and cell_details[row][column].parent_j != column):
+            #Add this one to the path
+            path.append((cell_details[row][column].parent_i, cell_details[row][column].parent_j))
+            #Re-assigning
+            temp_row = cell_details[row][column].parent_i
+            row = temp_row
+            temp_column = cell_details[row][column].parent_j
+            column = temp_column
+        #Reversing path as we went from destination to source
+        path.reverse()
+        #Adding the destination in the path
+        path.append((destination[0], destination[1]))
+        #Printing out the path
+        for i in path:
+            print(i, "->", end = "")
+
+        return path
 
 
     # h_value needs to be called here but for now can comment out
