@@ -1,8 +1,10 @@
 # A* Algorithm
 # Date created: 18th August
 # Modification date: 18th August Teresa
+    # Last update notes: A* is running and main is working, however I do not understand the H value output and I do not think trace_path is running
+    # Tried using the last for loop in trace path but it gives me a strange output-not the actual path
 # Author/s: Teresa Chhabra and Nicky Gerrard
-# Updated version with Teresa's part - did not want to break Version 300724
+# Note: Updated version with Teresa's part - did not want to break Version 300724 - works with A* and main function running - user inputs for grid size and checking path
 # Imports
 from math import sqrt
 import heapq
@@ -88,29 +90,27 @@ class A_star_functions():
             # temp_column = cell_details[row][column].parent_j #teresa commented this
             temp_column = cell_details[row][column].p_column
             column = temp_column
-            # teresa
-            # alternate way: #wont need temps
+            # teresa: alternate way that essentially makes the code smaller, and it won't need temps. see below.
             # row, column = cell_details[row][column].p_row, cell_details[row][column].p_column
+            print("check trace: the current cell is at row", row, "and column", column) # testing to see if code is going through trace_path
         # Reversing path as we went from destination to source
         path.reverse()
         # Adding the destination in the path
         path.append((destination[0], destination[1]))
+        #return path
         # Printing out the path
         for i in path:
-            print(i, "->", end="")
+            print(i, "->", end="")  # teresa: called trace_path in a_star # when i uncomment this area: it gives me a weird output
         return path
 
     # Implementation fo A* Algorithm!! Checks given source and dest are valid and not blocked.
     # inspired by gyg in some places
     def a_star(grid, source, destination):
         # Checking that the given source and destination locations are valid, that the source and destination are not blocked
-        if not A_star_functions.valid(source[0], source[1]) or not A_star_functions.valid(destination[0],
-                                                                                          destination[1]):
+        if not A_star_functions.valid(source[0], source[1]) or not A_star_functions.valid(destination[0], destination[1]):
             print("This is an invalid source or destination.")
             return []
-        if not A_star_functions.unblocked(grid, source[0], source[1]) or not A_star_functions.unblocked(grid,
-                                                                                                        destination[0],
-                                                                                                        destination[1]):
+        if not A_star_functions.unblocked(grid, source[0], source[1]) or not A_star_functions.unblocked(grid, destination[0], destination[1]):
             print("The source or destination is currently blocked.")
             return []
         # Check we are not already at the destination
@@ -146,7 +146,8 @@ class A_star_functions():
                         cell_details[next_i][next_j].p_row = i
                         cell_details[next_i][next_j].p_column = j
                         found_dest = True
-                        return A_star_functions.trace_path(destination, cell_details)
+                        print("checking if a_star_functions.dest_reached is running") # testing to see if its being called - can confirm its running
+                        return A_star_functions.trace_path(destination, cell_details)  # Calling trace_path function
                     elif not closed_list[next_i][next_j] and A_star_functions.unblocked(grid, next_i, next_j):
                         # Calculate which of the next available cells has the lowest f value
                         g_new = cell_details[i][j].s_cost + 1.0
@@ -177,12 +178,9 @@ class A_star_functions():
             A_star_functions.grid_size(rows, columns)
             # print("Grid size set to:", rows, "rows and", columns, "columns!")  # testing can be commented
 
-            # this works amazing 8:34pm i commented this
             grid = []
             print("Obstacles = 1 \n"  # Explains to user what obstacles equate to
                   "Empty spaces = 0 \n"  # Explains to user what empty spaces equate to
-                  "Start point = 2\n"  # Explains to user what start point is
-                  "End point = 3 \n"  # Explains to user what end point is
                   "Enter grid data row by row, with spaces in between.")
             for i in range(rows):
                 row_input = input(f"Row {i + 1}: ")
@@ -191,23 +189,27 @@ class A_star_functions():
                     print(
                         "Please note that the number of columns in the row does not match the specified number of columns.")
                 grid.append(row)
-                print(f"This is how your grid looks after adding Row {i + 1}:", grid)
-                # Define the source and destination - use user input
-                source = tuple(map(int, input("Enter source (row, column): ").split(',')))
-                destination = tuple(map(int, input("Enter destination (row, column): ").split(',')))
+                print(f"Grid after adding Row {i + 1}:", grid)
 
-                source = (source[0] - 1, source[1] - 1)
-                destination = (destination[0] - 1, destination[1] - 1)
+            print("--- \n"
+                  "This is the final Grid:", grid, "\n---")
 
-                print("This is the current Grid: ", grid)
-                print("You are at (Source): ", source)
-                print("You want to go to (Destination): ", destination)
+            # Define the source and destination - use user input
+            source = tuple(map(int, input("Enter start point (row, column): ").split(',')))
+            destination = tuple(map(int, input("Enter end point (row, column): ").split(',')))
 
-                path = A_star_functions.a_star(grid, source, destination)
-                if path:
-                    print("This is the path using A*: ", path)
-                else:
-                    print("There is unfortunately no path found.")
+            source = (source[0] - 1, source[1] - 1)
+            destination = (destination[0] - 1, destination[1] - 1)
+
+            print("---") # testing purposes - so i can spatially read it
+            print(source, "is currently the start point. While", destination, "is the end point.")
+            print("---") # testing purposes - so i can spatially read it
+
+            path = A_star_functions.a_star(grid, source, destination)  # Calling a_star which calls trace_path
+            if path:
+                print("This is the path using A*: ", path)
+            else:
+                print("There is unfortunately no path found.")
         except Exception as e:
             print("An error occurred: ", e)
 
