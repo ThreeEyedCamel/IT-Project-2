@@ -57,7 +57,7 @@ class A_star_functions():
         DY = dest_y - row
         # H value using euclidean distanceD
         H_value = sqrt(DX ** 2 + DY ** 2)
-        print("H value: ", H_value)  # teresa commented this
+        #print("H value: ", H_value)  # teresa commented this
         return H_value
 
     # print("current location: 1, 1 Destination: 50, 73") #teresa commented this
@@ -97,11 +97,11 @@ class A_star_functions():
         path.reverse()
         # Adding the destination in the path
         path.append((destination[0], destination[1]))
-        #return path
-        # Printing out the path
-        for i in path:
-            print(i, "->", end="")  # teresa: called trace_path in a_star # when i uncomment this area: it gives me a weird output
         return path
+        # Printing out the path
+        #for i in path:
+            #print(i, "->", end="")  # teresa: called trace_path in a_star # when i uncomment this area: it gives me a weird output
+        #return path
 
     # Implementation fo A* Algorithm!! Checks given source and dest are valid and not blocked.
     # inspired by gyg in some places
