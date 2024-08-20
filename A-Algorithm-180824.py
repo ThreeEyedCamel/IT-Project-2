@@ -1,6 +1,6 @@
 # A* Algorithm
 # Date created: 18th August
-# Modification date: 18th August Teresa
+# Modification date: 18th August Teresa, 20th August Teresa/Nicky, 
     # Last update notes: A* is running and main is working, however I do not understand the H value output and I do not think trace_path is running
     # Tried using the last for loop in trace path but it gives me a strange output-not the actual path
 # Author/s: Teresa Chhabra and Nicky Gerrard
@@ -78,8 +78,8 @@ class A_star_functions():
         path = []
         # While the current location(cell_details[row][column].parent) is not the destination(row, col)
         # while (cell_details[row][column].parent_i != row and cell_details[row][column].parent_j != column): #teresa commented this
-        while (cell_details[row][column].p_row != row and cell_details[row][
-            column].p_column != column):  # teresa here trying to test something so changed parent_i/j to p_row and p_column like defined earlier
+        while (cell_details[row][column].p_row != row and cell_details[row][column].p_column != column):  # teresa here trying to test something so changed parent_i/j to p_row and p_column like defined earlier
+        #while not (cell_details[row][column].p_row != row and cell_details[row][column].p_column != column):
             # Add this one to the path
             # path.append((cell_details[row][column].parent_i, cell_details[row][column].parent_j)) #teresa commented this
             path.append((cell_details[row][column].p_row, cell_details[row][column].p_column))
@@ -97,20 +97,26 @@ class A_star_functions():
         path.reverse()
         # Adding the destination in the path
         path.append((destination[0], destination[1]))
+        #path.append((row, column)) # teresa was here hellooo
         return path
         # Printing out the path
         #for i in path:
             #print(i, "->", end="")  # teresa: called trace_path in a_star # when i uncomment this area: it gives me a weird output
         #return path
 
-    # Implementation fo A* Algorithm!! Checks given source and dest are valid and not blocked.
-    # inspired by gyg in some places
+        # Implementation fo A* Algorithm!! Checks given source and dest are valid and not blocked.
+        # inspired by gyg in some places
     def a_star(grid, source, destination):
         # Checking that the given source and destination locations are valid, that the source and destination are not blocked
-        if not A_star_functions.valid(source[0], source[1]) or not A_star_functions.valid(destination[0], destination[1]):
+        if not A_star_functions.valid(source[0], source[1]) or not A_star_functions.valid(destination[0],
+                                                                                          destination[1]):
             print("This is an invalid source or destination.")
             return []
-        if not A_star_functions.unblocked(grid, source[0], source[1]) or not A_star_functions.unblocked(grid, destination[0], destination[1]):
+        if not A_star_functions.unblocked(grid, source[0], source[1]) or not A_star_functions.unblocked(grid,
+                                                                                                        destination[
+                                                                                                            0],
+                                                                                                        destination[
+                                                                                                            1]):
             print("The source or destination is currently blocked.")
             return []
         # Check we are not already at the destination
@@ -146,7 +152,8 @@ class A_star_functions():
                         cell_details[next_i][next_j].p_row = i
                         cell_details[next_i][next_j].p_column = j
                         found_dest = True
-                        print("checking if a_star_functions.dest_reached is running") # testing to see if its being called - can confirm its running
+                        print(
+                            "checking if a_star_functions.dest_reached is running")  # testing to see if its being called - can confirm its running
                         return A_star_functions.trace_path(destination, cell_details)  # Calling trace_path function
                     elif not closed_list[next_i][next_j] and A_star_functions.unblocked(grid, next_i, next_j):
                         # Calculate which of the next available cells has the lowest f value
@@ -189,7 +196,7 @@ class A_star_functions():
                     print(
                         "Please note that the number of columns in the row does not match the specified number of columns.")
                 grid.append(row)
-                print(f"Grid after adding Row {i + 1}:", grid)
+                #print(f"Grid after adding Row {i + 1}:", grid) # saves so much time to comment this lol
 
             print("--- \n"
                   "This is the final Grid:", grid, "\n---")
