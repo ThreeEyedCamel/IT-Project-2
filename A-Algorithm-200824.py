@@ -57,9 +57,8 @@ class A_star_functions():
         DY = dest_y - row
         # H value using euclidean distanceD
         H_value = sqrt(DX ** 2 + DY ** 2)
-        #print("H value: ", H_value)  # teresa commented this
         return H_value
-
+    """REMOVE AFTER TESTING IS COMPLETE"""
     # print("current location: 1, 1 Destination: 50, 73") #teresa commented this
     # h_value(1, 1, [50, 73]) #teresa commented this
 
@@ -76,30 +75,22 @@ class A_star_functions():
         row = destination[0]
         column = destination[1]
         path = []
-        # While the current location(cell_details[row][column].parent) is not the destination(row, col)
-        # while (cell_details[row][column].parent_i != row and cell_details[row][column].parent_j != column): #teresa commented this
-        while (cell_details[row][column].p_row != row and cell_details[row][column].p_column != column):  # teresa here trying to test something so changed parent_i/j to p_row and p_column like defined earlier
-        #while not (cell_details[row][column].p_row != row and cell_details[row][column].p_column != column):
-            # Add this one to the path
-            # path.append((cell_details[row][column].parent_i, cell_details[row][column].parent_j)) #teresa commented this
+        while not(cell_details[row][column].p_row == row and cell_details[row][column].p_column == column): 
+        # Add this one to the path
             path.append((cell_details[row][column].p_row, cell_details[row][column].p_column))
             # Re-assigning
-            # temp_row = cell_details[row][column].parent_i #teresa commented this
             temp_row = cell_details[row][column].p_row
             row = temp_row
-            # temp_column = cell_details[row][column].parent_j #teresa commented this
             temp_column = cell_details[row][column].p_column
             column = temp_column
-            # teresa: alternate way that essentially makes the code smaller, and it won't need temps. see below.
-            # row, column = cell_details[row][column].p_row, cell_details[row][column].p_column
             print("check trace: the current cell is at row", row, "and column", column) # testing to see if code is going through trace_path
         # Reversing path as we went from destination to source
         path.reverse()
         # Adding the destination in the path
         path.append((destination[0], destination[1]))
-        #path.append((row, column)) # teresa was here hellooo
         return path
-        # Printing out the path
+        """REMOVE WHEN TESTING IS COMPLETE"""
+        # Printing out the path for testing
         #for i in path:
             #print(i, "->", end="")  # teresa: called trace_path in a_star # when i uncomment this area: it gives me a weird output
         #return path
@@ -169,8 +160,8 @@ class A_star_functions():
                             cell_details[next_i][next_j].h_cost = h_new
                             cell_details[next_i][next_j].p_row = i
                             cell_details[next_i][next_j].p_column = j
-            for direction in range(8):  # 8 degrees of freedom yeehaw
-                next_i, next_j = calculate_next_position(i, j, direction)
+            """for direction in range(8):  # 8 degrees of freedom yeehaw
+                next_i, next_j = calculate_next_position(i, j, direction)"""
             '''20th august version: trying to fix trace_path and displaying path, logic issues?? testing that by adding degrees of freedom 
             if is_valid(next_i, next_j) and not is_obstacle(next_i, next_j) and not is_visited(next_i, next_j):
                 update_cell_details(i, j, next_i, next_j)
