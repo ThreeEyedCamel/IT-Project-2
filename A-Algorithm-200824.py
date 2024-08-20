@@ -1,10 +1,9 @@
 # A* Algorithm
 # Date created: 18th August
-# Modification date: 18th August Teresa, 20th August Teresa/Nicky,
-    # Last update notes: A* is running and main is working, however I do not understand the H value output and I do not think trace_path is running
-    # Tried using the last for loop in trace path but it gives me a strange output-not the actual path
+# Date updated last: 20th August
+# Modification date: 18th August Teresa, 20th August Teresa, 20th August Nicky
 # Author/s: Teresa Chhabra and Nicky Gerrard
-# Note: Updated version with Teresa's part - did not want to break Version 300724 - works with A* and main function running - user inputs for grid size and checking path
+# Notes: Currently working on integrating all functions seamlessly
 # Imports
 from math import sqrt
 import heapq
@@ -58,6 +57,7 @@ class A_star_functions():
         # H value using euclidean distanceD
         H_value = sqrt(DX ** 2 + DY ** 2)
         return H_value
+
     """REMOVE AFTER TESTING IS COMPLETE"""
     # print("current location: 1, 1 Destination: 50, 73") #teresa commented this
     # h_value(1, 1, [50, 73]) #teresa commented this
@@ -75,15 +75,15 @@ class A_star_functions():
         row = destination[0]
         column = destination[1]
         path = []
-        while not(cell_details[row][column].p_row == row and cell_details[row][column].p_column == column): 
-        # Add this one to the path
+        while not (cell_details[row][column].p_row == row and cell_details[row][column].p_column == column):
+            # Add this one to the path
             path.append((cell_details[row][column].p_row, cell_details[row][column].p_column))
             # Re-assigning
             temp_row = cell_details[row][column].p_row
             row = temp_row
             temp_column = cell_details[row][column].p_column
             column = temp_column
-            print("check trace: the current cell is at row", row, "and column", column) # testing to see if code is going through trace_path
+            # print("check trace: the current cell is at row", row, "and column", column) # testing to see if code is going through trace_path #can confirm it is running 20th August
         # Reversing path as we went from destination to source
         path.reverse()
         # Adding the destination in the path
@@ -91,12 +91,13 @@ class A_star_functions():
         return path
         """REMOVE WHEN TESTING IS COMPLETE"""
         # Printing out the path for testing
-        #for i in path:
-            #print(i, "->", end="")  # teresa: called trace_path in a_star # when i uncomment this area: it gives me a weird output
-        #return path
+        # for i in path:
+        # print(i, "->", end="")  # teresa: called trace_path in a_star # when i uncomment this area: it gives me a weird output
+        # return path
 
         # Implementation fo A* Algorithm!! Checks given source and dest are valid and not blocked.
         # inspired by gyg in some places
+
     def a_star(grid, source, destination, is_valid=None):
         # Checking that the given source and destination locations are valid, that the source and destination are not blocked
         if not A_star_functions.valid(source[0], source[1]) or not A_star_functions.valid(destination[0],
@@ -134,7 +135,7 @@ class A_star_functions():
                 open_list)  # Pop the cell with the smallest f-value (we want this one) from the to be visited list
             closed_list[i][j] = True  # This small f-value cell is placed into the visited list
             # Look at what the next available cell is in all directions (current cell's x and y values with the directions added to it)
-            directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+            directions = [(-1, 0), (1, 0), (0, -1), (0, 1)] # 8 degrees of freedom being implemented but not properly called?? teresa
             for direction in directions:
                 next_i, next_j = i + direction[0], j + direction[1]
                 # Check the next cell is valid, not blocked, not the destination (If it is, you're done give a success message)
@@ -168,7 +169,7 @@ class A_star_functions():
             add_to_open_list(next_i, next_j)'''
         # If we cant find the destination - give an unsuccessful message
         if not found_dest:
-            print("This program has unfortunately failed to find the destination cell. Suck it.")
+            print("This program has unfortunately failed to find the destination cell :(")
             return []
 
     # Implementation of Main Function!!!!!!!!!!!!!!!
@@ -193,7 +194,7 @@ class A_star_functions():
                     print(
                         "Please note that the number of columns in the row does not match the specified number of columns.")
                 grid.append(row)
-                #print(f"Grid after adding Row {i + 1}:", grid) # saves so much time to comment this lol
+                # print(f"Grid after adding Row {i + 1}:", grid) # saves so much time to comment this lol
 
             print("--- \n"
                   "This is the final Grid:", grid, "\n---")
@@ -205,9 +206,9 @@ class A_star_functions():
             source = (source[0] - 1, source[1] - 1)
             destination = (destination[0] - 1, destination[1] - 1)
 
-            print("---") # testing purposes - so i can spatially read it
+            print("---")  # testing purposes - so i can spatially read it
             print(source, "is currently the start point. While", destination, "is the end point.")
-            print("---") # testing purposes - so i can spatially read it
+            print("---")  # testing purposes - so i can spatially read it
 
             path = A_star_functions.a_star(grid, source, destination)  # Calling a_star which calls trace_path
             if path:
@@ -221,4 +222,3 @@ class A_star_functions():
 # Run the algorithm by calling a_star
 if __name__ == "__main__":
     A_star_functions.main()
-
