@@ -5,6 +5,8 @@ import hashlib
 import socket
 import threading
 import re
+from tkinter import *
+import tkinter as tk
 incorrect_login = 0
 def security_setup():
     #Connect to database - need to create the database
@@ -44,8 +46,6 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(("localhost", 9999))
 server.listen()
 
-
-
 def update_userdata(username, password):
     conn = sqlite3.connect("userdata.db")
     #Cursor for the connection
@@ -64,7 +64,6 @@ def update_userdata(username, password):
     conn.commit()
     print("Database updated!")
     conn.close()
-
 
 #password is being sent in cleartext
 def handle_connection(c):
@@ -93,7 +92,6 @@ def handle_connection(c):
     finally:
         c.close()
 
-
 def client():
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(("localhost", 9999)) 
@@ -114,6 +112,7 @@ def start_server():
         client, addr = server.accept()
         threading.Thread(target=handle_connection, args=(client,)).start()
 
+
 def main():
     #The server and client need to be called in seperate threads as they must occur at the same time 
     server_thread = threading.Thread(target=start_server)
@@ -122,32 +121,104 @@ def main():
     #Client will start in the main thread
     client()
 
+
 def has_numbers(string):
     return bool(re.search(r'\d', string))
 
+
 def special_characters(string):
     characters = "!@#$%^&*()-+?_=,<>/"
-    result = False
     if any(i in characters for i in string):
         result = True
     else:
         result = False
     return result
 
-if __name__ == "__main__":
-    answer = int(input("1 for login or 2 for create account"))
-    if answer == 1:
-        main()
-    elif answer == 2:
-        match = False
-        username = input("Enter username: ")
-        print("Password requirements:\n 10 characters long \n Contains numbers \n Contains a special character")
-        password1 = input("Enter password: ")
-        password2 = input("Re-enter password: ")
-        if password1 == password2 and len(password1) >=10 and has_numbers(password1) == True and special_characters(password1) == True:
+
+def first_window():
+    root1 = Tk()
+    root1.title("Choice")
+    
+    setButton = tk.Button(root1, 
+                        text = "Set credentials",  
+                        command = set_credentials
+                        ) 
+    loginButton = tk.Button(root1, 
+                        text = "Login",  
+                        command = main
+                        ) 
+    setButton.place(relx=0.5, rely=0.2, anchor='n')
+    loginButton.place(relx=0.5, rely=0.4, anchor='n')
+    
+
+    root1.mainloop()
+
+
+def set_credentials():
+    root = Tk()
+    root.title("Set Credentials")
+    root.geometry("500x500+50+50")  # width x height + x + y
+
+    #Make labels
+    text = Label(root, text="Login")
+    textU = Label(root, text="Username:")
+    textP1 = Label(root, text="Password:")
+    textP2 = Label(root, text="Re-enter password: ")
+    req = Label(root, text="Password requirements:\n 10 characters long \n Contains numbers \n Contains a special character")
+
+    #Define input boxes
+    inputUser = tk.Text(root, 
+                   height = 2, 
+                   width = 20) 
+    inputP1 = tk.Text(root, 
+                   height = 2, 
+                   width = 20) 
+    inputP2 = tk.Text(root, 
+                   height = 2, 
+                   width = 20)  
+    
+    
+    #Define button
+    submitButton = tk.Button(root, 
+                        text = "Submit",  
+                        command = lambda: verify(inputUser.get(1.0, "end-1c"), inputP1.get(1.0, "end-1c"), inputP2.get(1.0, "end-1c"))
+                        ) 
+
+    text.pack()
+
+    #Place labels
+    textU.place(relx=0.5, rely=0.05, anchor='n')
+    textP1.place(relx=0.5, rely=0.2, anchor='n')
+    textP2.place(relx=0.5, rely=0.35, anchor='n')
+    req.place(relx=0.5, rely=0.8, anchor='n')
+    #Place buttons
+    submitButton.place(relx=0.5, rely=0.6, anchor='n')
+    #Place input boxes
+    inputUser.place(relx=0.5, rely=0.1, anchor='n')
+    inputP1.place(relx=0.5, rely=0.25, anchor='n')
+    inputP2.place(relx=0.5, rely=0.4, anchor='n')
+
+    root.mainloop()
+    
+
+def verify(user, pass1, pass2):
+    match = False
+    root3 = Tk()
+    
+    if pass1 == pass2 and len(pass1) >=10 and has_numbers(pass1) == True and special_characters(pass1) == True:
             match = True
-            update_userdata(username, password1)
-        else:
-            print("Password doesn't meet requirements")    
+            update_userdata(user, pass1)
+            text1 = Label(root3, text="Credentials added")
+            text1.pack()
+            
     else:
-        print("The option selected is not valid, please try again")
+            text2 = Label(root3, text="Password doesn't meet requirements")
+            text2.pack()
+            match = False
+
+    root3.mainloop()
+    return match
+
+
+if __name__ == "__main__":
+    first_window()
