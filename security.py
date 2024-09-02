@@ -65,15 +65,48 @@ def update_userdata(username, password):
     print("Database updated!")
     conn.close()
 
+
 #password is being sent in cleartext
 def handle_connection(c):
 
     try: 
-        c.send("Username: ".encode())
-        username = c.recv(1024).decode()
+        root4 = Tk()
+        root4.title("Set Credentials")
+        root4.geometry("500x500+50+50")  # width x height + x + y
 
-        c.send("Password: ".encode())
-        password = c.recv(1024).decode()
+        #Make labels
+        text = Label(root4, text="Login")
+        textU = Label(root4, text="Username:")
+        textP1 = Label(root4, text="Password:")
+        #Define input boxes
+        inputUser = tk.Text(root4, 
+                    height = 2, 
+                    width = 20) 
+        inputP1 = tk.Text(root4, 
+                    height = 2, 
+                    width = 20) 
+        username, password = inputUser.get(1.0, "end-1c"), inputP1.get(1.0, "end-1c")
+        #Define button
+        submitButton = tk.Button(root4, 
+                            text = "Submit",  
+                            command = lambda: connection_result(c,inputUser.get(1.0, "end-1c"), inputP1.get(1.0, "end-1c"))
+                            ) 
+        text.pack()
+        textU.place(relx=0.5, rely=0.05, anchor='n')
+        textP1.place(relx=0.5, rely=0.2, anchor='n')
+
+        inputUser.place(relx=0.5, rely=0.1, anchor='n')
+        inputP1.place(relx=0.5, rely=0.25, anchor='n')
+
+        #Place buttons
+        submitButton.place(relx=0.5, rely=0.6, anchor='n')
+        
+        
+        root4.mainloop()
+    finally:
+        c.close()
+def connection_result(c,username, password):
+        
         password = hashlib.sha256(password.encode()).hexdigest()
 
         conn = sqlite3.connect(r"C:\Users\domin\Desktop\IT Project 2\userdata.db")
@@ -81,17 +114,19 @@ def handle_connection(c):
         
         #Preset the statement to help avoid sql injection
         cur.execute("SELECT * FROM userdata WHERE username = ? AND password = ?", (username, password))
+        
         if cur.fetchall(): #If it returns true its correct password
+            root5 = Tk()
+            text1 = Label(root5, text="Login successful!")
+            text1.pack()
             c.send("Login successful!".encode())
             #Call the GUI function
         else:
-
+            root5 = Tk()
+            text1 = Label(root5, text="Login FAILED")
+            text1.pack()
             c.send("Login FAILED".encode())
-            incorrect_login +=1
-
-    finally:
-        c.close()
-
+        
 def client():
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(("localhost", 9999)) 
