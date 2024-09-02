@@ -4,6 +4,8 @@ import sqlite3
 import hashlib
 import socket
 import threading
+import re
+incorrect_login = 0
 def security_setup():
     #Connect to database - need to create the database
     conn = sqlite3.connect("userdata.db")
@@ -42,6 +44,28 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(("localhost", 9999))
 server.listen()
 
+
+
+def update_userdata(username, password):
+    conn = sqlite3.connect("userdata.db")
+    #Cursor for the connection
+    cur = conn.cursor()
+
+    #Create the table
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS userdata (
+                id INTEGER PRIMARY KEY,         
+                username VARCHAR(255) NOT NULL, 
+                password VARCHAR(255) NOT NULL
+                )
+    """)
+    username1, password1 = username, hashlib.sha256(password.encode()).hexdigest()
+    cur.execute("INSERT INTO userdata(username, password) VALUES(?,?)",(username1, password1))
+    conn.commit()
+    print("Database updated!")
+    conn.close()
+
+
 #password is being sent in cleartext
 def handle_connection(c):
 
@@ -62,7 +86,10 @@ def handle_connection(c):
             c.send("Login successful!".encode())
             #Call the GUI function
         else:
+
             c.send("Login FAILED".encode())
+            incorrect_login +=1
+
     finally:
         c.close()
 
@@ -95,11 +122,32 @@ def main():
     #Client will start in the main thread
     client()
 
+def has_numbers(string):
+    return bool(re.search(r'\d', string))
+
+def special_characters(string):
+    characters = "!@#$%^&*()-+?_=,<>/"
+    result = False
+    if any(i in characters for i in string):
+        result = True
+    else:
+        result = False
+    return result
+
 if __name__ == "__main__":
     answer = int(input("1 for login or 2 for create account"))
     if answer == 1:
         main()
     elif answer == 2:
-        print("Create account is currently unavailable")
+        match = False
+        username = input("Enter username: ")
+        print("Password requirements:\n 10 characters long \n Contains numbers \n Contains a special character")
+        password1 = input("Enter password: ")
+        password2 = input("Re-enter password: ")
+        if password1 == password2 and len(password1) >=10 and has_numbers(password1) == True and special_characters(password1) == True:
+            match = True
+            update_userdata(username, password1)
+        else:
+            print("Password doesn't meet requirements")    
     else:
         print("The option selected is not valid, please try again")
