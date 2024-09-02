@@ -1,3 +1,5 @@
+# Author Nicky
+# Last update: 02/09/2024
 import sqlite3
 import hashlib
 import sqlite3
@@ -7,7 +9,8 @@ import threading
 import re
 from tkinter import *
 import tkinter as tk
-incorrect_login = 0
+
+#Setting up the userdata database
 def security_setup():
     #Connect to database - need to create the database
     conn = sqlite3.connect("userdata.db")
@@ -24,11 +27,12 @@ def security_setup():
     """)
 
     #Setup some data to test, ensuring the username is encoded
-    username1, password1 = 'Nicky1', hashlib.sha256("nickyspassword1".encode()).hexdigest() 
-    username2, password2 = 'Nicky2', hashlib.sha256("nickyspassword2".encode()).hexdigest() 
-    username3, password3 = 'Nicky3', hashlib.sha256("nickyspassword3".encode()).hexdigest() 
-    username4, password4 = 'Nicky4', hashlib.sha256("nickyspassword4".encode()).hexdigest() 
-    username5, password5 = 'Nicky5', hashlib.sha256("nickyspassword5".encode()).hexdigest()
+    username1, password1 = 'User1', hashlib.sha256("password1".encode()).hexdigest() 
+    username2, password2 = 'User2', hashlib.sha256("password2".encode()).hexdigest() 
+    username3, password3 = 'User3', hashlib.sha256("password3".encode()).hexdigest() 
+    username4, password4 = 'User4', hashlib.sha256("password4".encode()).hexdigest() 
+    username5, password5 = 'User5', hashlib.sha256("password5".encode()).hexdigest()
+
     #Place this data into the table
     cur.execute("INSERT INTO userdata(username, password) VALUES(?,?)",(username1, password1)) 
     cur.execute("INSERT INTO userdata(username, password) VALUES(?,?)",(username2, password2)) 
@@ -46,12 +50,13 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(("localhost", 9999))
 server.listen()
 
+#Update the database with new credentials
 def update_userdata(username, password):
     conn = sqlite3.connect("userdata.db")
     #Cursor for the connection
     cur = conn.cursor()
 
-    #Create the table
+    #Create the table if it doesnt exist
     cur.execute("""
     CREATE TABLE IF NOT EXISTS userdata (
                 id INTEGER PRIMARY KEY,         
@@ -59,14 +64,16 @@ def update_userdata(username, password):
                 password VARCHAR(255) NOT NULL
                 )
     """)
+
+    #update the table with the newest data
     username1, password1 = username, hashlib.sha256(password.encode()).hexdigest()
     cur.execute("INSERT INTO userdata(username, password) VALUES(?,?)",(username1, password1))
     conn.commit()
     print("Database updated!")
     conn.close()
 
-
-#password is being sent in cleartext
+#Login to the app
+#Password is being sent in cleartext
 def handle_connection(c):
 
     try: 
@@ -105,6 +112,8 @@ def handle_connection(c):
         root4.mainloop()
     finally:
         c.close()
+
+
 def connection_result(c,username, password):
         
         password = hashlib.sha256(password.encode()).hexdigest()
@@ -127,6 +136,7 @@ def connection_result(c,username, password):
             text1.pack()
             c.send("Login FAILED".encode())
         
+
 def client():
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(("localhost", 9999)) 
