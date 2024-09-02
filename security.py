@@ -64,13 +64,10 @@ def handle_connection(c):
         else:
             c.send("Login FAILED".encode())
     finally:
-        print("hello there")
         c.close()
-        client()
 
 
 def client():
-    print("hi")
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(("localhost", 9999)) 
 
@@ -99,4 +96,10 @@ def main():
     client()
 
 if __name__ == "__main__":
-    main()
+    answer = int(input("1 for login or 2 for create account"))
+    if answer == 1:
+        main()
+    elif answer == 2:
+        print("Create account is currently unavailable")
+    else:
+        print("The option selected is not valid, please try again")
