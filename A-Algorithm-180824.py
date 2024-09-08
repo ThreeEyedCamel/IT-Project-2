@@ -1,4 +1,4 @@
-# A* Algorithm
+# A* Algorithm V1
 # Date created: 18th August
 # Modification date: 18th August Teresa, 20th August Teresa/Nicky, 
     # Last update notes: A* is running and main is working, however I do not understand the H value output and I do not think trace_path is running
