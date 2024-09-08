@@ -2,9 +2,8 @@
 A* Algorithm V3
 Date created: 8th Sep
 Date updated last: 8th Sep
-Modification date: 18th Aug Teresa, 20th Aug Teresa, 20th Aug Nicky, 8th Sep
+Modification date: 18th Aug Teresa, 20th Aug Teresa, 20th Aug Nicky, 8th Sep Teresa
 Author/s: Teresa Chhabra and Nicky Gerrard
-Notes: Currently working on integrating all functions seamlessly
 """
 
 # Imports
@@ -25,7 +24,6 @@ class Cell():
 
 GRID_ROWS = 0
 GRID_COLUMNS = 0
-
 
 class a_star_func():
 
@@ -55,22 +53,13 @@ class a_star_func():
         DY = dest_y - row # DY is how far away on the Y axis the destination is from the current position
         H_value = sqrt(DX ** 2 + DY ** 2) # H value using euclidean distance D
         return H_value
-        #return np.sqrt((destination[0] - column[0]) ** 2 + (destination[1] - row[1]) ** 2)
 
-
-    """REMOVE AFTER TESTING IS COMPLETE"""
-    # print("current location: 1, 1 Destination: 50, 73") #teresa commented this
-    # h_value(1, 1, [50, 73]) #teresa commented this
-
-    """
+    """Trace Function: 
     Traces the path from end destination to the start location using parent cells 
-    Goes through 'cell details' and appends each visited space to the path 
-    Formats the path
+    Goes through 'cell details' and appends each visited space to the path, formats the path
     Effectively, we have already found the shortest path and are now returning it
     Returns a list of tuples 
-    NOTE: Cell details should loop through each cell in the grid and call the Cell function for each one
-    """
-
+    NOTE: Cell details should loop through each cell in the grid and call the Cell function for each one."""
     def trace_path(destination, cell_details):
         row = destination[0]
         column = destination[1]
@@ -83,7 +72,7 @@ class a_star_func():
             column = temp_column
         path.reverse() # Reversing path as we went from destination to source
         path.append((destination[0], destination[1])) # Adding the destination in the path
-        print(f"reconstructed path: {path}")
+        #print(f"reconstructed path: {path}") # testing
         return path
 
     """A* Function: This checks given source and dest are valid and not blocked."""
@@ -120,7 +109,7 @@ class a_star_func():
         # Loop over the algorithm:
         while open_list:
             _, i, j = heapq.heappop(open_list)  # Pop the cell with the smallest f-value (we want this one) from the to be visited list
-            print(f"Current node: ({i}, {j})")
+            #print(f"Current node: ({i}, {j})") # testing
             closed_list[i][j] = True  # This small f-value cell is placed into the visited list
             # Look at what the next available cell is in all directions (current cell's x and y values with the directions added to it)
             directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
@@ -128,12 +117,12 @@ class a_star_func():
                 next_i, next_j = i + direction[0], j + direction[1]
                 # Check the next cell is valid, not blocked, not the destination (If it is, you're done give a success message)
                 if a_star_func.valid(next_i, next_j):
-                    print(f"Neighbour : ({next_i}, {next_j})")
+                    #print(f"Neighbour : ({next_i}, {next_j})") # testing
                     if a_star_func.dest_reach(next_i, next_j, end):
                         cell_details[next_i][next_j].p_row = i
                         cell_details[next_i][next_j].p_column = j
                         found_dest = True
-                        print("checking if a_star_functions.dest_reached is running")  # testing to see if its being called - can confirm its running
+                        #print("checking if a_star_functions.dest_reached is running")  # testing
                         return a_star_func.trace_path(end, cell_details)  # Calling trace_path function
                     elif not closed_list[next_i][next_j] and a_star_func.unblocked(grid, next_i, next_j):
                         # Calculate which of the next available cells has the lowest f value
@@ -141,7 +130,7 @@ class a_star_func():
                         h_new = a_star_func.h_value(next_i, next_j, end)
                         f_new = g_new + h_new
                         # If this new cell has the lowest value - add it to the list we want it
-                        print(f"Updating node ({next_i}, {next_j}) with g={g_new}, h={h_new}, f={f_new}")
+                        #print(f"Updating node ({next_i}, {next_j}) with g={g_new}, h={h_new}, f={f_new}") # testing
                         if cell_details[next_i][next_j].t_cost == float('inf') or cell_details[next_i][
                             next_j].t_cost > f_new:
                             heapq.heappush(open_list, (f_new, next_i, next_j))
@@ -157,13 +146,12 @@ class a_star_func():
 
     """Main FUNCTION: This defines grid, source and destination all via user input. Runs the algorithm by calling a_star."""
     def main():  # ignore the red line lol
-        #print("Main function has begun")  # testing can be commented
         try:
             # Define the grid - use user input and make sure to update the universal variables grid_rows and grid_columns
             rows = int(input("Enter the number of rows in grid: "))
             columns = int(input("Enter the number of columns in grid: "))
             a_star_func.grid_size(rows, columns)
-            print("Grid size set to:", rows, "rows and", columns, "columns!")  # testing can be commented
+            #print("Grid size set to:", rows, "rows and", columns, "columns!")  # testing
 
             grid = []
             print("Obstacles = 1 \n"  # Explains to user what obstacles equate to
@@ -173,13 +161,9 @@ class a_star_func():
                 row_input = input(f"Row {i + 1}: ")
                 row = list(map(int, row_input.split()))
                 if len(row) != columns:
-                    print(
-                        "Please note that the number of columns in the row does not match the specified number of columns.")
+                    print("Please note that the number of columns in the row does not match the specified number of columns.")
                 grid.append(row)
-                print(f"Grid after adding Row {i + 1}:", grid) # saves so much time to comment this lol
-
-            #print("--- \n"
-                  #"This is the final Grid:", grid, "\n---")
+                #print(f"Grid after adding Row {i + 1}:", grid) # testing
 
             # Define the source and destination - use user input
             source = tuple(map(int, input("Enter start point (row, column): ").split(',')))
@@ -188,8 +172,9 @@ class a_star_func():
             source = (source[0] - 1, source[1] - 1)
             destination = (destination[0] - 1, destination[1] - 1)
 
+            # testing:
             #print("---")  # testing purposes - so i can spatially read it
-            print(source, "is currently the start point. While", destination, "is the end point.")
+            #print(source, "is currently the start point. While", destination, "is the end point.")
             #print("---")  # testing purposes - so i can spatially read it
 
             path = a_star_func.a_star(grid, source, destination)  # Calling a_star which calls trace_path
