@@ -3,18 +3,19 @@ from tkinter import *
 import re
 import os
 from PIL import Image, ImageTk
+from algorithms import a_algorithm
 
 
 class MazeEditor(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Maze Editor")
-        self.grid_width = 40
+        self.grid_width = 50
         self.grid_height = 30
         self.cell_size = 20
         self.canvas_width = (self.grid_width + 2) * self.cell_size
         self.canvas_height = (self.grid_height + 2) * self.cell_size
-        self.animation_delay = 500
+        self.animation_delay = 0
         # Initialise matrix
         self.maze_matrix = None
         self.create_matrix(self.grid_width, self.grid_height)
@@ -96,7 +97,10 @@ class MazeEditor(tk.Tk):
         self.button_label_import = tk.Label(self.button_frame, text="Import Maze")
         self.button_label_import.grid(row=1, column=6)
 
-        self.button_test_animation = tk.Button(self.button_frame, text="Test Animation", command=self.animate_path_test)
+        # self.button_test_animation = tk.Button(self.button_frame, text="Test Animation", command=self.animate_path_test)
+        # self.button_test_animation.grid(row=0, column=8, padx=5, pady=5)
+
+        self.button_test_animation = tk.Button(self.button_frame, text="Test Algorithm", command=self.test_animation)
         self.button_test_animation.grid(row=0, column=8, padx=5, pady=5)
 
         # Drop-down menu
@@ -263,9 +267,9 @@ class MazeEditor(tk.Tk):
         if 1 <= x < self.grid_width + 1 and 1 <= y < self.grid_height + 1:
             # Reset start/finish coords
             if self.maze_matrix[y][x] == 2:
-                self.start_coords = [-1, -1]
+                self.start_coords = (-1, -1)
             if self.maze_matrix[y][x] == 3:
-                self.finish_coords = [-1, -1]
+                self.finish_coords = (-1, -1)
             self.maze_matrix[y][x] = 0
             self.canvas.delete(f"cell_{x}_{y}")
 
@@ -276,7 +280,7 @@ class MazeEditor(tk.Tk):
             y = event.y // self.cell_size
             if 1 <= x < self.grid_width + 1 and 1 <= y < self.grid_height + 1:
                 self.maze_matrix[y][x] = 2
-                self.start_coords = [x, y]
+                self.start_coords = (x, y)
                 self.canvas.create_rectangle(
                     x * self.cell_size,
                     y * self.cell_size,
@@ -292,7 +296,7 @@ class MazeEditor(tk.Tk):
             x = event.x // self.cell_size
             y = event.y // self.cell_size
             if 1 <= x < self.grid_width + 1 and 1 <= y < self.grid_height + 1:
-                self.finish_coords = [x, y]
+                self.finish_coords = (x, y)
                 self.maze_matrix[y][x] = 3
                 self.canvas.create_rectangle(
                     x * self.cell_size,
@@ -351,7 +355,24 @@ class MazeEditor(tk.Tk):
                                      tags=(f"cell_{coordinates[0]}_{coordinates[1]}", 'maze')
                                      )
 
-    def animate_moves(self, moveset, viewset, index=0):
+    def animate_moves(self, moveset, index=0):
+        """
+        Animates path without needing a viewset.
+
+        :param moveset:
+        :param index:
+        :return:
+        """
+        try:
+            print(f"animate move {moveset[index]}, index={index}")
+            if index < len(moveset):
+                self.update_path(moveset[index])
+            # Cheeky way to make sure the next move waits
+            self.after(self.animation_delay, self.animate_moves, moveset, index + 1)
+        except IndexError as e:
+            print("Moveset complete,", e)
+
+    def animate_moves_views(self, moveset, viewset, index=0):
         """
         Animates the 'path' of the agent in grey.
 
@@ -363,12 +384,15 @@ class MazeEditor(tk.Tk):
         :type index: int
         :return: None
         """
-        print(f"animate move {moveset[index]}, index={index}")
-        if index < len(moveset):
-            self.update_path(moveset[index])
-            self.after(self.animation_delay, self.animate_views, viewset, index)
-        # Cheeky way to make sure the next move waits
-        self.after(self.animation_delay * (1 + len(viewset[index])), self.animate_moves, moveset, viewset, index + 1)
+        try:
+            print(f"animate move {moveset[index]}, index={index}")
+            if index < len(moveset):
+                self.update_path(moveset[index])
+                self.after(self.animation_delay, self.animate_views, viewset, index)
+            # Cheeky way to make sure the next move waits
+            self.after(self.animation_delay * (1 + len(viewset[index])), self.animate_moves_views, moveset, viewset, index + 1)
+        except IndexError as e:
+            print("Moveset complete", e)
 
     def animate_views(self, viewset, index, subindex=0):
         """
@@ -382,10 +406,13 @@ class MazeEditor(tk.Tk):
         :type subindex: int
         :return: None
         """
-        print(f"animate view {viewset[index][subindex]}, index={index}, subindex={subindex}")
-        if subindex < len(viewset[index]):
-            self.update_searched(viewset[index][subindex])
-        self.after(self.animation_delay, self.animate_views, viewset, index, subindex + 1)
+        try:
+            print(f"animate view {viewset[index][subindex]}, index={index}, subindex={subindex}")
+            if subindex < len(viewset[index]):
+                self.update_searched(viewset[index][subindex])
+            self.after(self.animation_delay, self.animate_views, viewset, index, subindex + 1)
+        except IndexError as e:
+            print("Viewset complete,", e)
 
     def animate_path_test(self):
         """
@@ -400,13 +427,25 @@ class MazeEditor(tk.Tk):
             [(3, 4), (2, 5)],
             [(1, 5), (2, 6)]
         ]
-        self.animate_moves(moveset, viewset)
+        self.animate_moves_views(moveset, viewset)
         viewset_length = 0
         for i in range(len(viewset)):
             for _ in viewset[i]:
                 viewset_length += 1
 
         self.after(self.animation_delay * (1 + len(moveset) + viewset_length), self.enable_buttons)
+
+    def test_animation(self):
+        """
+        Test A* animation function
+
+        :return:
+        """
+        self.disable_buttons()
+        moveset = a_algorithm.a_star(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)
+        self.animate_moves(moveset)
+
+        self.after(self.animation_delay * (1 + len(moveset)), self.enable_buttons)
 
 
 if __name__ == "__main__":
