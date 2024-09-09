@@ -31,8 +31,8 @@ class MazeEditor(tk.Tk):
         self.old_y = None
 
         # Start and finish coordinates
-        self.start_coords = [-1, -1]
-        self.finish_coords = [-1, -1]
+        self.start_coords = (-1, -1)
+        self.finish_coords = (-1, -1)
 
         # Images
         self.draw_icon = Image.open(r"icons/paintbrush.png").resize((32, 32))
@@ -106,6 +106,9 @@ class MazeEditor(tk.Tk):
         file_menu_drop = OptionMenu(self.button_frame, self.variable, *file_menu_options)
         file_menu_drop.grid(row=0, column=7, padx=5, pady=5)
 
+        self.algorithm_parameters = [self.grid_width, self.grid_height, self.maze_matrix,
+                                     self.start_coords, self.finish_coords]
+
     def create_matrix(self, matrix_width, matrix_height):
         print("create matrix")
         self.maze_matrix = [[0 for _ in range(matrix_width)] for _ in range(matrix_height)]
@@ -133,11 +136,11 @@ class MazeEditor(tk.Tk):
                     self.canvas.create_rectangle(square_dims, fill="black")
                 if self.maze_matrix[y][x] == 2:
                     self.canvas.create_rectangle(square_dims, fill="green")
-                    self.start_coords = [x, y]
+                    self.start_coords = (x, y)
                     print(f"start coord: {x},{y}")
                 if self.maze_matrix[y][x] == 3:
                     self.canvas.create_rectangle(square_dims, fill="red")
-                    self.finish_coords = [x, y]
+                    self.finish_coords = (x, y)
                     print(f"finish coord: {x},{y}")
 
     def draw_mode(self):
@@ -241,9 +244,9 @@ class MazeEditor(tk.Tk):
         if 0 <= x < self.grid_width + 2 and 0 <= y < self.grid_height + 2:
             # Reset start/finish coords
             if self.maze_matrix[y][x] == 2:
-                self.start_coords = [-1, -1]
+                self.start_coords = (-1, -1)
             if self.maze_matrix[y][x] == 3:
-                self.finish_coords = [-1, -1]
+                self.finish_coords = (-1, -1)
             self.maze_matrix[y][x] = 1
             self.canvas.create_rectangle(
                 x * self.cell_size,
@@ -312,8 +315,8 @@ class MazeEditor(tk.Tk):
         self.create_matrix(self.grid_width, self.grid_height)
         self.canvas.delete("maze")
         self.initialise_canvas()
-        self.start_coords = [-1, -1]
-        self.finish_coords = [-1, -1]
+        self.start_coords = (-1, -1)
+        self.finish_coords = (-1, -1)
 
     def import_maze(self):
         import_file_path = "savedCourses/" + self.variable.get()
@@ -353,9 +356,9 @@ class MazeEditor(tk.Tk):
         Animates the 'path' of the agent in grey.
 
         :param moveset: List of two-integer lists representing coordinates visited by agent
-        :type moveset: list[list[int]]
+        :type moveset: list[tuple[int]]
         :param viewset: For every move: list of two-integer lists representing coordinates viewed by agent
-        :type viewset: list[list[list[int]]]
+        :type viewset: list[list[tuple[int]]]
         :param index: Counter
         :type index: int
         :return: None
@@ -363,7 +366,7 @@ class MazeEditor(tk.Tk):
         print(f"animate move {moveset[index]}, index={index}")
         if index < len(moveset):
             self.update_path(moveset[index])
-            self.after(500, self.animate_views, viewset, index)
+            self.after(self.animation_delay, self.animate_views, viewset, index)
         # Cheeky way to make sure the next move waits
         self.after(self.animation_delay * (1 + len(viewset[index])), self.animate_moves, moveset, viewset, index + 1)
 
@@ -372,7 +375,7 @@ class MazeEditor(tk.Tk):
         Animates the 'searched' areas of the agent in grey.
 
         :param viewset: For every move: list of two-integer lists representing coordinates viewed by agent
-        :type viewset: list[list[list[int]]]
+        :type viewset: list[list[tuple[int]]]
         :param index: References the move that applies to the corresponding viewset
         :type index: int
         :param subindex: References coordinate pairs within viewset
@@ -390,12 +393,12 @@ class MazeEditor(tk.Tk):
 
         """
         self.disable_buttons()
-        moveset = [[2, 2], [2, 3], [2, 4], [2, 5]]
+        moveset = [(2, 2), (2, 3), (2, 4), (2, 5)]
         viewset = [
-            [[3, 2], [2, 3]],
-            [[1, 3], [2, 4]],
-            [[3, 4], [2, 5]],
-            [[1, 5], [2, 6]]
+            [(3, 2), (2, 3)],
+            [(1, 3), (2, 4)],
+            [(3, 4), (2, 5)],
+            [(1, 5), (2, 6)]
         ]
         self.animate_moves(moveset, viewset)
         viewset_length = 0
