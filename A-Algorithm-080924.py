@@ -1,8 +1,8 @@
 """
 A* Algorithm V3
 Date created: 8th Sep
-Date updated last: 8th Sep
-Modification date: 18th Aug Teresa, 20th Aug Teresa, 20th Aug Nicky, 8th Sep Teresa
+Date updated last: 10th Sep 
+Modification date: 8th Sep Teresa, 10th Sep Teresa
 Author/s: Teresa Chhabra and Nicky Gerrard
 """
 
@@ -76,7 +76,7 @@ class a_star_func():
         return path
 
     """A* Function: This checks given source and dest are valid and not blocked."""
-    def a_star(grid, start, end, is_valid=None):
+    def a_star(grid, start, end):
         # Checking that the given source and destination locations are valid, that the source and destination are not blocked
         if not a_star_func.valid(start[0], start[1]) or not a_star_func.valid(end[0], end[1]):
             print("This is an invalid source or destination.")
@@ -117,7 +117,7 @@ class a_star_func():
                 next_i, next_j = i + direction[0], j + direction[1]
                 # Check the next cell is valid, not blocked, not the destination (If it is, you're done give a success message)
                 if a_star_func.valid(next_i, next_j):
-                    #print(f"Neighbour : ({next_i}, {next_j})") # testing
+                    print(f"Neighbour : ({next_i}, {next_j})") # testing
                     if a_star_func.dest_reach(next_i, next_j, end):
                         cell_details[next_i][next_j].p_row = i
                         cell_details[next_i][next_j].p_column = j
@@ -151,7 +151,7 @@ class a_star_func():
             rows = int(input("Enter the number of rows in grid: "))
             columns = int(input("Enter the number of columns in grid: "))
             a_star_func.grid_size(rows, columns)
-            #print("Grid size set to:", rows, "rows and", columns, "columns!")  # testing
+            print("Grid size set to:", rows, "rows and", columns, "columns!")  # testing
 
             grid = []
             print("Obstacles = 1 \n"  # Explains to user what obstacles equate to
@@ -174,7 +174,7 @@ class a_star_func():
 
             # testing:
             #print("---")  # testing purposes - so i can spatially read it
-            #print(source, "is currently the start point. While", destination, "is the end point.")
+            print(source, "is currently the start point. While", destination, "is the end point.")
             #print("---")  # testing purposes - so i can spatially read it
 
             path = a_star_func.a_star(grid, source, destination)  # Calling a_star which calls trace_path
