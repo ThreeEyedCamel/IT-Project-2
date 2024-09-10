@@ -10,7 +10,7 @@ class MazeEditor(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Maze Editor")
-        self.grid_width = 50
+        self.grid_width = 40
         self.grid_height = 30
         self.cell_size = 20
         self.canvas_width = (self.grid_width + 2) * self.cell_size

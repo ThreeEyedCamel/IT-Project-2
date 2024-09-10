@@ -56,6 +56,7 @@ def h_value(row, column, destination):
     H_value = sqrt(DX ** 2 + DY ** 2) # H value using euclidean distance D
     return H_value
 
+
 """Trace Function: 
 Traces the path from end destination to the start location using parent cells 
 Goes through 'cell details' and appends each visited space to the path, formats the path
@@ -67,20 +68,28 @@ def trace_path(destination, cell_details):
     column = destination[1]
     path = []
     while not (cell_details[row][column].p_row == row and cell_details[row][column].p_column == column):
-        path.append((cell_details[row][column].p_row, cell_details[row][column].p_column))  # Add this one to the path
+
+        cell = (cell_details[row][column].p_row, cell_details[row][column].p_column)  #Start edit cells
+        path.append(cell[::-1])  # Add this one to the path
         temp_row = cell_details[row][column].p_row # Re-assigning
         row = temp_row
         temp_column = cell_details[row][column].p_column
         column = temp_column
-    path.reverse() # Reversing path as we went from destination to source
-    path.append((destination[0], destination[1])) # Adding the destination in the path
+    path.reverse()  # Reversing path as we went from destination to source
+    path.append((destination[1], destination[0])) # Adding the destination in the path
     # print(f"reconstructed path: {path}") # testing
+    print(path)
+    print(f"path length: {len(path)}")
     return path
 
 
 def a_star(grid, start, end):
     """A* Function: This checks given source and dest are valid and not blocked."""
-    grid_size(rows=len(grid[0]), columns=len(grid))  # Set grid size
+
+    start = start[::-1]
+    end = end[::-1]
+
+    grid_size(rows=len(grid), columns=len(grid[1]))  # Set grid size
     print(f"rows: {GRID_ROWS}\ncolumns: {GRID_COLUMNS}")
 
     # Check that the given source and destination locations are valid, that the source and destination are not blocked
@@ -125,8 +134,9 @@ def a_star(grid, start, end):
             next_i, next_j = i + direction[0], j + direction[1]
             # Check the next cell is valid, not blocked, not the destination (If it is, you're done give a success message)
             if valid(next_i, next_j):
-                #print(f"Neighbour : ({next_i}, {next_j})") # testing
+                # print(f"Neighbour : ({next_i}, {next_j})") # testing
                 if dest_reach(next_i, next_j, end):
+                    print(f"Destination reached: ({next_i},{next_j})")  # Debug
                     cell_details[next_i][next_j].p_row = i
                     cell_details[next_i][next_j].p_column = j
                     found_dest = True
@@ -138,7 +148,7 @@ def a_star(grid, start, end):
                     h_new = h_value(next_i, next_j, end)
                     f_new = g_new + h_new
                     # If this new cell has the lowest value - add it to the list we want it
-                    #print(f"Updating node ({next_i}, {next_j}) with g={g_new}, h={h_new}, f={f_new}") # testing
+                    # print(f"Updating node ({next_i}, {next_j}) with g={g_new}, h={h_new}, f={f_new}") # testing
                     if cell_details[next_i][next_j].t_cost == float('inf') or cell_details[next_i][
                         next_j].t_cost > f_new:
                         heapq.heappush(open_list, (f_new, next_i, next_j))
@@ -149,7 +159,6 @@ def a_star(grid, start, end):
                         cell_details[next_i][next_j].p_column = j
     # If we cant find the destination - give an unsuccessful message
     if not found_dest:
-        print("This program has unfortunately failed to find the destination cell :(")
         raise Exception("This program has unfortunately failed to find the destination cell :(")
 
 
