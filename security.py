@@ -1,5 +1,9 @@
 # Author Nicky
 # Last update: 02/09/2024
+"""
+INTEGRATION NOTE:
+connection_result is where to call the GUI - its commented 
+"""
 import sqlite3
 import hashlib
 import sqlite3
