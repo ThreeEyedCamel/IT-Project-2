@@ -35,6 +35,7 @@ def grid_size(rows, columns):
 
 # Check if the cell is within the grid - returns boolean
 def valid(row, column):
+    # print(f"row: {row}, GRID_ROWS: {GRID_ROWS}\ncolumn: {column}, GRID_COLUMNS: {GRID_COLUMNS}")
     return 0 <= row < GRID_ROWS and 0 <= column < GRID_COLUMNS
 
 # Checks if the destination can be accessed - returns boolean
@@ -77,15 +78,16 @@ def trace_path(destination, cell_details):
     return path
 
 
-def a_star(grid, start, end, is_valid=None):
+def a_star(grid, start, end):
     """A* Function: This checks given source and dest are valid and not blocked."""
-    grid_size(rows=len(grid), columns=len(grid[0]))  # Set grid size
+    grid_size(rows=len(grid[0]), columns=len(grid))  # Set grid size
+    print(f"rows: {GRID_ROWS}\ncolumns: {GRID_COLUMNS}")
 
     # Check that the given source and destination locations are valid, that the source and destination are not blocked
+
+    print(f"Start valid: {valid(start[0], start[1])}\nEnd valid: {valid(end[0], end[1])}")
     if not valid(start[0], start[1]) or not valid(end[0], end[1]):
-        print("This is an invalid source or destination.")
-        print(f"Source: {start}\nDestination: {end}")
-        return None
+        raise Exception(f"Invalid source or destination\n Source: {start}\n Destination: {end}")
 
     # if not unblocked(grid, start[0], start[1]) or not unblocked(grid, end[0], end[1]):
     #     print("The start or end is currently blocked.")
@@ -148,7 +150,7 @@ def a_star(grid, start, end, is_valid=None):
     # If we cant find the destination - give an unsuccessful message
     if not found_dest:
         print("This program has unfortunately failed to find the destination cell :(")
-        return None
+        raise Exception("This program has unfortunately failed to find the destination cell :(")
 
 
 """THIS FUNCTION IS NOT REQUIRED FOR MAZE INTEGRATION"""
