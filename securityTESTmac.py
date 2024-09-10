@@ -50,6 +50,7 @@ def update_userdata(username, password):
     """)
 
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    print(hashed_password)
     cur.execute("INSERT INTO userdata(username, password) VALUES(?,?)", (username, hashed_password))
     conn.commit()
     conn.close()
@@ -82,11 +83,15 @@ def handle_connection(c):
 
 def connection_result(c, username, password):
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    print(f"Debug: Username: {username}, Password: {hashed_password}")
     conn = sqlite3.connect("userdata.db")
     cur = conn.cursor()
-    cur.execute("SELECT * FROM userdata WHERE username = ? AND password = ?", (username, hashed_password))
-
-    if cur.fetchall():
+    #cur.execute("SELECT * FROM userdata WHERE username = ? AND password = ?", (username, hashed_password))
+    cur.execute("SELECT * FROM userdata")
+    result = cur.fetchall()
+    print(f"Debug: Query Result: {result}")
+    print(type(result))
+    if result:
         msg = "Login successful!"
     else:
         msg = "Login FAILED"
