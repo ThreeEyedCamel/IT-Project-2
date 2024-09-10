@@ -20,7 +20,6 @@ def security_setup():
     conn = sqlite3.connect("userdata.db")
     #Cursor for the connection
     cur = conn.cursor()
-
     #Create the table
     cur.execute("""
     CREATE TABLE IF NOT EXISTS userdata (
@@ -50,6 +49,8 @@ def security_setup():
     result = cur.fetchall()
     print(result)
     conn.close()
+
+"""REMOVE??"""
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(("localhost", 9999))
 server.listen()
@@ -100,7 +101,7 @@ def handle_connection(c):
         #Define button
         submitButton = tk.Button(root4, 
                             text = "Submit",  
-                            command = lambda: connection_result(c,inputUser.get(1.0, "end-1c"), inputP1.get(1.0, "end-1c"))
+                            command = lambda: connection_result(c,inputUser.get(1.0, "end-1c"), inputP1.get(1.0, "end-1c")) #ERROR LINE
                             ) 
         text.pack()
         textU.place(relx=0.5, rely=0.05, anchor='n')
@@ -122,7 +123,7 @@ def connection_result(c,username, password):
         
         password = hashlib.sha256(password.encode()).hexdigest()
 
-        conn = sqlite3.connect(r"\userdata.db")
+        conn = sqlite3.connect("userdata.db") #ERROR LINE
         cur = conn.cursor()
         
         #Preset the statement to help avoid sql injection
