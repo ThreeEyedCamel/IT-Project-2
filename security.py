@@ -31,11 +31,11 @@ def security_setup():
     """)
 
     #Setup some data to test, ensuring the username is encoded
-    username1, password1 = 'User1', hashlib.sha256("password1".encode()).hexdigest() 
-    username2, password2 = 'User2', hashlib.sha256("password2".encode()).hexdigest() 
-    username3, password3 = 'User3', hashlib.sha256("password3".encode()).hexdigest() 
-    username4, password4 = 'User4', hashlib.sha256("password4".encode()).hexdigest() 
-    username5, password5 = 'User5', hashlib.sha256("password5".encode()).hexdigest()
+    username1, password1 = 'User1', hashlib.sha256("password1234!".encode()).hexdigest() 
+    username2, password2 = 'User2', hashlib.sha256("password2234!".encode()).hexdigest() 
+    username3, password3 = 'User3', hashlib.sha256("password3234!".encode()).hexdigest() 
+    username4, password4 = 'User4', hashlib.sha256("password4234!".encode()).hexdigest() 
+    username5, password5 = 'User5', hashlib.sha256("password5234!".encode()).hexdigest()
 
     #Place this data into the table
     cur.execute("INSERT INTO userdata(username, password) VALUES(?,?)",(username1, password1)) 
@@ -122,7 +122,7 @@ def connection_result(c,username, password):
         
         password = hashlib.sha256(password.encode()).hexdigest()
 
-        conn = sqlite3.connect(r"C:\Users\domin\Desktop\IT Project 2\userdata.db")
+        conn = sqlite3.connect(r"\userdata.db")
         cur = conn.cursor()
         
         #Preset the statement to help avoid sql injection
