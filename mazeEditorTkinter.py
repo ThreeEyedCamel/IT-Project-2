@@ -9,6 +9,7 @@ from algorithms import a_algorithm, rrt
 class MazeEditor(tk.Tk):
     def __init__(self):
         super().__init__()
+        print("--Debug-- init MazeEditor object")  # Debug
         self.title("Maze Editor")
         self.grid_width = 40
         self.grid_height = 30
@@ -20,9 +21,10 @@ class MazeEditor(tk.Tk):
         self.maze_matrix = None
         self.create_matrix(self.grid_width, self.grid_height)
         # Initialise canvas
-        self.background_image = Image.open(r"icons/background.png").resize(
-            (self.canvas_width, self.canvas_height))  # Resize to canvas size
-        self.background_image = ImageTk.PhotoImage(self.background_image)
+        # self.background_image = Image.open(r"icons/background.png").resize(
+        #     (self.canvas_width, self.canvas_height))  # Resize to canvas size
+        # self.background_image = ImageTk.PhotoImage(self.background_image)
+        print("--Debug-- images set")  # Debug
         self.canvas = tk.Canvas(self, width=self.canvas_width, height=self.canvas_height)
         self.canvas.pack()
 
@@ -113,8 +115,10 @@ class MazeEditor(tk.Tk):
         self.algorithm_parameters = [self.grid_width, self.grid_height, self.maze_matrix,
                                      self.start_coords, self.finish_coords]
 
+        print("--Debug-- init function complete")  # Debug
+
     def create_matrix(self, matrix_width, matrix_height):
-        print("create matrix")
+        print("--Debug-- create matrix")  # Debug
         self.maze_matrix = [[0 for _ in range(matrix_width)] for _ in range(matrix_height)]
         for line in self.maze_matrix:
             line.insert(0, 1)
@@ -128,8 +132,8 @@ class MazeEditor(tk.Tk):
 
         :return:
         """
-        print("initialise canvas")
-        self.canvas.create_image(0, 0, image=self.background_image, anchor="nw")
+        print("--Debug-- begin initialise canvas")  # Debug
+        # self.canvas.create_image(0, 0, image=self.background_image, anchor="nw")
         for y in range(len(self.maze_matrix)):
             for x in range(len(self.maze_matrix[0])):
                 square_dims = (x * self.cell_size,
@@ -146,6 +150,9 @@ class MazeEditor(tk.Tk):
                     self.canvas.create_rectangle(square_dims, fill="red")
                     self.finish_coords = (x, y)
                     print(f"finish coord: {x},{y}")
+
+        print("--Debug-- initialise canvas complete")  # Debug
+
 
     def draw_mode(self):
         print("draw mode")

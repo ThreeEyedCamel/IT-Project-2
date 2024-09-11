@@ -5,6 +5,7 @@ import threading
 import re
 from tkinter import *
 import tkinter as tk
+import mazeEditorTkinter
 
 #Setting up the userdata database
 def security_setup():
@@ -93,6 +94,9 @@ def connection_result(c, username, password):
     print(type(result))
     if result:
         msg = "Login successful!"
+        # GUI Integration
+        app = mazeEditorTkinter.MazeEditor()
+        app.mainloop()
     else:
         msg = "Login FAILED"
 
