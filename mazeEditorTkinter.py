@@ -3,7 +3,7 @@ from tkinter import *
 import re
 import os
 from PIL import Image, ImageTk
-from algorithms import a_algorithm
+from algorithms import a_algorithm, rrt
 
 
 class MazeEditor(tk.Tk):
@@ -100,7 +100,7 @@ class MazeEditor(tk.Tk):
         # self.button_test_animation = tk.Button(self.button_frame, text="Test Animation", command=self.animate_path_test)
         # self.button_test_animation.grid(row=0, column=8, padx=5, pady=5)
 
-        self.button_test_animation = tk.Button(self.button_frame, text="Test Algorithm", command=self.test_animation)
+        self.button_test_animation = tk.Button(self.button_frame, text="Test Algorithm", command=self.test_algorithm)
         self.button_test_animation.grid(row=0, column=8, padx=5, pady=5)
 
         # Drop-down menu
@@ -435,14 +435,17 @@ class MazeEditor(tk.Tk):
 
         self.after(self.animation_delay * (1 + len(moveset) + viewset_length), self.enable_buttons)
 
-    def test_animation(self):
+    def test_algorithm(self):
         """
-        Test A* animation function
+        Test A* algorithm function
 
         :return:
         """
         self.disable_buttons()
-        moveset = a_algorithm.a_star(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)
+        moveset = a_algorithm.a_star(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # A* test
+        # moveset = rrt.rapidly_exploring_random_tree(maze=self.maze_matrix)  # RRT test
+
+        print(moveset)
         self.animate_moves(moveset)
 
         self.after(self.animation_delay * (1 + len(moveset)), self.enable_buttons)
