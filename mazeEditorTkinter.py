@@ -16,14 +16,14 @@ class MazeEditor(tk.Tk):
         self.cell_size = 20
         self.canvas_width = (self.grid_width + 2) * self.cell_size
         self.canvas_height = (self.grid_height + 2) * self.cell_size
-        self.animation_delay = 0
+        self.animation_delay = 100
         # Initialise matrix
         self.maze_matrix = None
         self.create_matrix(self.grid_width, self.grid_height)
         # Initialise canvas
-        # self.background_image = Image.open(r"icons/background.png").resize(
-        #     (self.canvas_width, self.canvas_height))  # Resize to canvas size
-        # self.background_image = ImageTk.PhotoImage(self.background_image)
+        self.background_image = Image.open(r"icons/background.png").resize(
+            (self.canvas_width, self.canvas_height))  # Resize to canvas size
+        self.background_image = ImageTk.PhotoImage(self.background_image)
         print("--Debug-- images set")  # Debug
         self.canvas = tk.Canvas(self, width=self.canvas_width, height=self.canvas_height)
         self.canvas.pack()
@@ -103,14 +103,21 @@ class MazeEditor(tk.Tk):
         # self.button_test_animation.grid(row=0, column=8, padx=5, pady=5)
 
         self.button_test_animation = tk.Button(self.button_frame, text="Test Algorithm", command=self.test_algorithm)
-        self.button_test_animation.grid(row=0, column=8, padx=5, pady=5)
+        self.button_test_animation.grid(row=0, column=9, padx=5, pady=5)
 
-        # Drop-down menu
+        # Drop-down menu - courses
         file_menu_options = os.listdir(os.getcwd() + "/savedCourses")
         self.variable = StringVar()
         self.variable.set(file_menu_options[0])
         file_menu_drop = OptionMenu(self.button_frame, self.variable, *file_menu_options)
         file_menu_drop.grid(row=0, column=7, padx=5, pady=5)
+
+        # Drop-down menu - algorithms
+        algorithm_menu_options = os.listdir(os.getcwd() + "/algorithms")
+        self.algo_variable = StringVar()
+        self.algo_variable.set(algorithm_menu_options[0])
+        algorithm_menu_drop = OptionMenu(self.button_frame, self.algo_variable, *algorithm_menu_options)
+        algorithm_menu_drop.grid(row=0, column=8, padx=5, pady=5)
 
         self.algorithm_parameters = [self.grid_width, self.grid_height, self.maze_matrix,
                                      self.start_coords, self.finish_coords]
@@ -133,7 +140,7 @@ class MazeEditor(tk.Tk):
         :return:
         """
         print("--Debug-- begin initialise canvas")  # Debug
-        # self.canvas.create_image(0, 0, image=self.background_image, anchor="nw")
+        self.canvas.create_image(0, 0, image=self.background_image, anchor="nw")
         for y in range(len(self.maze_matrix)):
             for x in range(len(self.maze_matrix[0])):
                 square_dims = (x * self.cell_size,
@@ -444,19 +451,25 @@ class MazeEditor(tk.Tk):
 
     def test_algorithm(self):
         """
-        Test A* algorithm function
+        Test function for calling algorithms
 
         :return:
         """
         self.disable_buttons()
         moveset = a_algorithm.a_star(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # A* test
-        # moveset = rrt.rapidly_exploring_random_tree(maze=self.maze_matrix)  # RRT test
+        # moveset = rrt.rapidly_exploring_random_tree(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # RRT test
 
         print(moveset)
         self.animate_moves(moveset)
 
         self.after(self.animation_delay * (1 + len(moveset)), self.enable_buttons)
 
+    # def execute_algorithm(self):
+    #     """
+    #     Function calls algorithms.
+    #     """
+    #     self.disable_buttons()
+    #     moveset = self.algo_variable(self.maze_matrix, self.start_coords, self.finish_coords)
 
 if __name__ == "__main__":
     app = MazeEditor()

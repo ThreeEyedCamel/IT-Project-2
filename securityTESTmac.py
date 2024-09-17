@@ -56,14 +56,21 @@ def update_userdata(username, password):
     conn.commit()
     conn.close()
 
+
 def handle_connection(c):
+    print("--Debug-- handle_connection")
     def on_submit():
+        print("--Debug-- submit clicked")
         username = inputUser.get(1.0, "end-1c")
         password = inputP1.get(1.0, "end-1c")
-        connection_result(c, username, password)
+        if connection_result(c, username, password):
+            print("--Debug-- connection good")
+            root4.after(0, func=root4.destroy)
+            GUI = mazeEditorTkinter.MazeEditor()
+            GUI.mainloop()
 
     root4 = Tk()
-    root4.title("Set Credentials")
+    root4.title("Login")
     root4.geometry("500x500+50+50")
 
     Label(root4, text="Login").pack()
@@ -82,6 +89,7 @@ def handle_connection(c):
     root4.mainloop()
     c.close()
 
+
 def connection_result(c, username, password):
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     print(f"Debug: Username: {username}, Password: {hashed_password}")
@@ -93,19 +101,26 @@ def connection_result(c, username, password):
     print(f"Debug: Query Result: {result}")
     print(type(result))
     if result:
+        print("Login successful!")
         msg = "Login successful!"
-        # GUI Integration
-        app = mazeEditorTkinter.MazeEditor()
-        app.mainloop()
-    else:
-        msg = "Login FAILED"
+        c.send(msg.encode())
+        return True
 
-    root5 = Tk()
-    Label(root5, text=msg).pack()
-    c.send(msg.encode())
-    root5.mainloop()
+    else:
+        print("Login FAILED")
+        msg = "Login FAILED"
+        c.send(msg.encode())
+        return False
+
+    # root5 = Tk()
+    # Label(root5, text=msg).pack()
+    # root5.mainloop()
+
+
+
 
 def client():
+    print("--Debug-- client")
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(("localhost", 9999))
 
@@ -124,6 +139,7 @@ def start_server():
         threading.Thread(target=handle_connection, args=(client,)).start()
 
 def main():
+    print("--Debug-- main")
     server_thread = threading.Thread(target=start_server)
     server_thread.daemon = True
     server_thread.start()
@@ -141,9 +157,11 @@ def first_window():
     root1.title("Choice")
 
     tk.Button(root1, text="Set credentials", command=set_credentials).place(relx=0.5, rely=0.2, anchor='n')
+    # tk.Button(root1, text="Login", command=lambda: [main, root1.after(1000, root1.destroy)]).place(relx=0.5, rely=0.4, anchor='n')
     tk.Button(root1, text="Login", command=main).place(relx=0.5, rely=0.4, anchor='n')
 
     root1.mainloop()
+
 
 def set_credentials():
     root = Tk()
@@ -161,9 +179,10 @@ def set_credentials():
     inputP2 = tk.Text(root, height=2, width=20)
 
     def on_submit():
-        verify(inputUser.get(1.0, "end-1c"), inputP1.get(1.0, "end-1c"), inputP2.get(1.0, "end-1c"))
+        if verify(inputUser.get(1.0, "end-1c"), inputP1.get(1.0, "end-1c"), inputP2.get(1.0, "end-1c")):
+            root.after(0, root.quit)
 
-    tk.Button(root, text="Submit", command=on_submit).place(relx=0.5, rely=0.6, anchor='n')
+    tk.Button(root, text="Submit", command= on_submit).place(relx=0.5, rely=0.6, anchor='n')
 
     inputUser.place(relx=0.5, rely=0.1, anchor='n')
     inputP1.place(relx=0.5, rely=0.25, anchor='n')
@@ -171,15 +190,41 @@ def set_credentials():
 
     root.mainloop()
 
+def login_window():
+
+
+    root4 = Tk()
+    root4.title("Login")
+    root4.geometry("500x500+50+50")
+
+    Label(root4, text="Login").pack()
+    Label(root4, text="Username:").place(relx=0.5, rely=0.05, anchor='n')
+    Label(root4, text="Password:").place(relx=0.5, rely=0.2, anchor='n')
+
+    inputUser = tk.Text(root4, height=2, width=20)
+    inputP1 = tk.Text(root4, height=2, width=20)
+
+    inputUser.place(relx=0.5, rely=0.1, anchor='n')
+    inputP1.place(relx=0.5, rely=0.25, anchor='n')
+
+    submitButton = tk.Button(root4, text="Submit", command=on_submit)
+    submitButton.place(relx=0.5, rely=0.6, anchor='n')
+
+    root4.mainloop()
+
+
 def verify(user, pass1, pass2):
     root3 = Tk()
     if pass1 == pass2 and len(pass1) >= 10 and has_numbers(pass1) and special_characters(pass1):
         update_userdata(user, pass1)
         Label(root3, text="Credentials added").pack()
+        root3.mainloop()
+        return True
     else:
         Label(root3, text="Password doesn't meet requirements").pack()
+        root3.mainloop()
+        return False
 
-    root3.mainloop()
 
 if __name__ == "__main__":
     first_window()
