@@ -1,8 +1,8 @@
 """
 A* Algorithm V3
 Date created: 8th Sep
-Date updated last: 24th Sep
-Modification date: 18th Aug Teresa, 20th Aug Teresa, 20th Aug Nicky, 8th Sep Teresa, 24th Sep Teresa
+Date updated last: 8th Sep
+Modification date: 18th Aug Teresa, 20th Aug Teresa, 20th Aug Nicky, 8th Sep Teresa
 Author/s: Teresa Chhabra and Nicky Gerrard
 """
 
@@ -81,7 +81,8 @@ def trace_path(destination, cell_details):
     print(path)
     print(f"path length: {len(path)}")
     return path
-              
+
+
 def a_star(grid, start, end):
     """A* Function: This checks given source and dest are valid and not blocked."""
 
@@ -160,15 +161,6 @@ def a_star(grid, start, end):
     if not found_dest:
         raise Exception("This program has unfortunately failed to find the destination cell :(")
 
-def start_a_star(grid, source, destination):
-    try:
-        path = a_star(grid, source, destination)  # Call A* algorithm
-        if path:
-            print("This is the path using A*: ", path)
-        else:
-            print("No path found.")
-    except Exception as e:
-        print("Error: ", e)
 
 """THIS FUNCTION IS NOT REQUIRED FOR MAZE INTEGRATION"""
 """Main FUNCTION: This defines grid, source and destination all via user input. Runs the algorithm by calling a_star."""
@@ -211,36 +203,6 @@ def main():  # ignore the red line lol
             print("There is unfortunately no path found.")
     except Exception as e:
         print("An error occurred: ", e)
-
-def main():  
-    try:
-        # Define the grid and get user input for rows, columns, etc.
-        rows = int(input("Enter the number of rows in grid: "))
-        columns = int(input("Enter the number of columns in grid: "))
-        grid_size(rows, columns)
-
-        grid = []
-        print("Obstacles = 1 \nEmpty spaces = 0 \nEnter grid data row by row, with spaces in between.")
-        for i in range(rows):
-            row_input = input(f"Row {i + 1}: ")
-            row = list(map(int, row_input.split()))
-            if len(row) != columns:
-                print("Number of columns does not match.")
-            grid.append(row)
-
-        # Get source and destination points
-        source = tuple(map(int, input("Enter start point (row, column): ").split(',')))
-        destination = tuple(map(int, input("Enter end point (row, column): ").split(',')))
-
-        source = (source[0] - 1, source[1] - 1)
-        destination = (destination[0] - 1, destination[1] - 1)
-
-        # Run A* in a separate thread to avoid blocking the GUI
-        a_star_thread = threading.Thread(target=start_a_star, args=(grid, source, destination))
-        a_star_thread.start()
-
-    except Exception as e:
-        print("Error occurred: ", e)
 
 
 # In order to run this algorithm, pass a_star the grid, source and destination\
