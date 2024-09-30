@@ -148,7 +148,7 @@ class MazeEditor(tk.Tk):
                                (x + 1) * self.cell_size,
                                (y + 1) * self.cell_size)
                 if self.maze_matrix[y][x] == 1:
-                    self.canvas.create_rectangle(square_dims, fill="black")
+                    self.canvas.create_rectangle(square_dims, fill="black", tags=(f"cell_{x}_{y}", 'maze'))
                 if self.maze_matrix[y][x] == 2:
                     self.canvas.create_rectangle(square_dims, fill="green")
                     self.start_coords = (x, y)
@@ -272,7 +272,7 @@ class MazeEditor(tk.Tk):
                 (x + 1) * self.cell_size,
                 (y + 1) * self.cell_size,
                 fill="black",
-                tags= (f"cell_{x}_{y}", 'maze')
+                tags=(f"cell_{x}_{y}", 'maze')
             )
 
     def erase(self, event):
@@ -455,9 +455,12 @@ class MazeEditor(tk.Tk):
 
         :return:
         """
+        if self.start_coords == (-1, -1) or self.finish_coords == (-1, -1):
+            return None
+
         self.disable_buttons()
-        moveset = a_algorithm.a_star(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # A* test
-        # moveset = rrt.rapidly_exploring_random_tree(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # RRT test
+        # moveset = a_algorithm.a_star(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # A* test
+        moveset = rrt.rapidly_exploring_random_tree(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # RRT test
 
         print(moveset)
         self.animate_moves(moveset)
