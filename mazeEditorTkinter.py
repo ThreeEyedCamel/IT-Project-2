@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import *
+from tkinter import * 
 import re
 import os
 from PIL import Image, ImageTk
@@ -370,13 +370,6 @@ class MazeEditor(tk.Tk):
                                      )
 
     def animate_moves(self, moveset, index=0):
-        """
-        Animates path without needing a viewset.
-
-        :param moveset:
-        :param index:
-        :return:
-        """
         try:
             print(f"animate move {moveset[index]}, index={index}")
             if index < len(moveset):
@@ -427,7 +420,7 @@ class MazeEditor(tk.Tk):
             self.after(self.animation_delay, self.animate_views, viewset, index, subindex + 1)
         except IndexError as e:
             print("Viewset complete,", e)
-
+    
     def animate_path_test(self):
         """
         Test function containing sample move/viewset
@@ -448,7 +441,7 @@ class MazeEditor(tk.Tk):
                 viewset_length += 1
 
         self.after(self.animation_delay * (1 + len(moveset) + viewset_length), self.enable_buttons)
-
+    
     def test_algorithm(self):
         """
         Test function for calling algorithms
@@ -459,13 +452,16 @@ class MazeEditor(tk.Tk):
             return None
 
         self.disable_buttons()
-        # moveset = a_algorithm.a_star(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # A* test
-        moveset = rrt.rapidly_exploring_random_tree(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # RRT test
+        moveset = a_algorithm.a_star(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # A* test
+        #moveset = rrt.rapidly_exploring_random_tree(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # RRT test
 
         print(moveset)
         self.animate_moves(moveset)
 
         self.after(self.animation_delay * (1 + len(moveset)), self.enable_buttons)
+
+
+    
 
     # def execute_algorithm(self):
     #     """

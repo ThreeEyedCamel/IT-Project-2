@@ -1,18 +1,10 @@
-"""
-A* Algorithm V3
-Date created: 8th Sep
-Date updated last: 8th Sep
-Modification date: 18th Aug Teresa, 20th Aug Teresa, 20th Aug Nicky, 8th Sep Teresa
-Author/s: Teresa Chhabra and Nicky Gerrard
-"""
+# last updated 30th sep teresa
 
-# Imports
 from math import sqrt
 import heapq
 import threading
 import time
 import numpy as np
-
 
 class Cell:
     def __init__(self):
@@ -22,11 +14,8 @@ class Cell:
         self.s_cost = float('inf')  # Cost from start to this cell
         self.h_cost = 0  # Heuristic cost from this cell to destination
 
-
 GRID_ROWS = 0
 GRID_COLUMNS = 0
-
-
 
 # Custom set the grid size - call this function after acquiring user input
 def grid_size(rows, columns):
@@ -53,22 +42,13 @@ def h_value(row, column, destination):
     dest_y = destination[1]
     DX = dest_x - column # DX is how far away on the X axis the destination is from the current position
     DY = dest_y - row # DY is how far away on the Y axis the destination is from the current position
-    H_value = sqrt(DX ** 2 + DY ** 2) # H value using euclidean distance D
-    return H_value
+    return sqrt(DX ** 2 + DY ** 2)
 
-
-"""Trace Function: 
-Traces the path from end destination to the start location using parent cells 
-Goes through 'cell details' and appends each visited space to the path, formats the path
-Effectively, we have already found the shortest path and are now returning it
-Returns a list of tuples 
-NOTE: Cell details should loop through each cell in the grid and call the Cell function for each one."""
 def trace_path(destination, cell_details):
     row = destination[0]
     column = destination[1]
     path = []
     while not (cell_details[row][column].p_row == row and cell_details[row][column].p_column == column):
-
         cell = (cell_details[row][column].p_row, cell_details[row][column].p_column)  #Start edit cells
         path.append(cell[::-1])  # Add this one to the path
         temp_row = cell_details[row][column].p_row # Re-assigning
@@ -76,18 +56,78 @@ def trace_path(destination, cell_details):
         temp_column = cell_details[row][column].p_column
         column = temp_column
     path.reverse()  # Reversing path as we went from destination to source
-    path.append((destination[1], destination[0])) # Adding the destination in the path
+    #path.append(start)
+    path.append((destination[0], destination[1])) # Adding the destination in the path # just changed
     # print(f"reconstructed path: {path}") # testing
     print(path)
     print(f"path length: {len(path)}")
     return path
 
-
-def a_star(grid, start, end):
-    """A* Function: This checks given source and dest are valid and not blocked."""
-
+"""def a_star(grid, start, end):
+    print("Starting A* algorithm...")
     start = start[::-1]
     end = end[::-1]
+
+    grid_size(rows=len(grid), columns=len(grid[1]))  # Set grid size
+    print(f"Grid size: {GRID_ROWS} x {GRID_COLUMNS}")
+
+    if not valid(start[0], start[1]) or not valid(end[0], end[1]):
+        raise Exception(f"Invalid source or destination\n Source: {start}\n Destination: {end}")
+
+    if dest_reach(start[0], start[1], end):
+        print("You are already at the destination!")
+        return [start]
+
+    closed_list = [[False for _ in range(GRID_COLUMNS)] for _ in range(GRID_ROWS)]
+    cell_details = [[Cell() for _ in range(GRID_COLUMNS)] for _ in range(GRID_ROWS)]
+
+    i, j = start
+    cell_details[i][j].s_cost = 0.0
+    cell_details[i][j].h_cost = h_value(i, j, end)
+    cell_details[i][j].t_cost = cell_details[i][j].s_cost + cell_details[i][j].h_cost
+    cell_details[i][j].p_row = i
+    cell_details[i][j].p_column = j
+
+    open_list = [(0.0, i, j)]
+    heapq.heapify(open_list)
+
+    while open_list:
+        _, i, j = heapq.heappop(open_list)
+        closed_list[i][j] = True
+
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+        for direction in directions:
+            next_i, next_j = i + direction[0], j + direction[1]
+            if valid(next_i, next_j):
+                if dest_reach(next_i, next_j, end):
+                    print(f"Destination reached at ({next_i}, {next_j})")
+                    cell_details[next_i][next_j].p_row = i
+                    cell_details[next_i][next_j].p_column = j
+                    return trace_path(end, cell_details)
+                elif not closed_list[next_i][next_j] and unblocked(grid, next_i, next_j):
+                    g_new = cell_details[i][j].s_cost + (1.0 if direction[0] == 0 or direction[1] == 0 else sqrt(2))
+                    h_new = h_value(next_i, next_j, end)
+                    f_new = g_new + h_new
+
+                    if cell_details[next_i][next_j].t_cost == float('inf') or cell_details[next_i][next_j].t_cost > f_new:
+                        heapq.heappush(open_list, (f_new, next_i, next_j))
+                        cell_details[next_i][next_j].t_cost = f_new
+                        cell_details[next_i][next_j].s_cost = g_new
+                        cell_details[next_i][next_j].h_cost = h_new
+                        cell_details[next_i][next_j].p_row = i
+                        cell_details[next_i][next_j].p_column = j
+        #print(f"Open list size: {len(open_list)}")  # Debugging the open list size
+    raise Exception("No path found.")
+"""
+
+def a_star(grid, start, end):
+    #A* Function: This checks given source and dest are valid and not blocked.
+
+    start = start[::-1]
+    print("The start node is:", start)
+    end = end[::-1]
+
+
 
     grid_size(rows=len(grid), columns=len(grid[1]))  # Set grid size
     print(f"rows: {GRID_ROWS}\ncolumns: {GRID_COLUMNS}")
@@ -97,10 +137,6 @@ def a_star(grid, start, end):
     print(f"Start valid: {valid(start[0], start[1])}\nEnd valid: {valid(end[0], end[1])}")
     if not valid(start[0], start[1]) or not valid(end[0], end[1]):
         raise Exception(f"Invalid source or destination\n Source: {start}\n Destination: {end}")
-
-    # if not unblocked(grid, start[0], start[1]) or not unblocked(grid, end[0], end[1]):
-    #     print("The start or end is currently blocked.")
-    #     return None
 
     # Check we are not already at the destination
     if dest_reach(start[0], start[1], end):
@@ -148,7 +184,7 @@ def a_star(grid, start, end):
                     h_new = h_value(next_i, next_j, end)
                     f_new = g_new + h_new
                     # If this new cell has the lowest value - add it to the list we want it
-                    # print(f"Updating node ({next_i}, {next_j}) with g={g_new}, h={h_new}, f={f_new}") # testing
+                    #print(f"Updating node ({next_i}, {next_j}) with g={g_new}, h={h_new}, f={f_new}") # testing
                     if cell_details[next_i][next_j].t_cost == float('inf') or cell_details[next_i][
                         next_j].t_cost > f_new:
                         heapq.heappush(open_list, (f_new, next_i, next_j))
@@ -164,7 +200,7 @@ def a_star(grid, start, end):
 
 """THIS FUNCTION IS NOT REQUIRED FOR MAZE INTEGRATION"""
 """Main FUNCTION: This defines grid, source and destination all via user input. Runs the algorithm by calling a_star."""
-def main():  # ignore the red line lol
+"""def main():  # ignore the red line lol
     try:
         # Define the grid - use user input and make sure to update the universal variables grid_rows and grid_columns
         rows = int(input("Enter the number of rows in grid: "))
@@ -202,7 +238,7 @@ def main():  # ignore the red line lol
         else:
             print("There is unfortunately no path found.")
     except Exception as e:
-        print("An error occurred: ", e)
+        print("An error occurred: ", e)"""
 
 
 # In order to run this algorithm, pass a_star the grid, source and destination\
