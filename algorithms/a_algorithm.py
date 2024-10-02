@@ -1,4 +1,6 @@
 # last updated 30th sep teresa
+# nicky updated 2nd oct
+# teresa updating 3rd oct 
 
 from math import sqrt
 import heapq
@@ -28,7 +30,12 @@ def grid_size(rows, columns):
 # Check if the cell is within the grid - returns boolean
 def valid(row, column):
     # print(f"row: {row}, GRID_ROWS: {GRID_ROWS}\ncolumn: {column}, GRID_COLUMNS: {GRID_COLUMNS}")
-    return 0 <= row < GRID_ROWS and 0 <= column < GRID_COLUMNS
+    #return 0 <= row < GRID_ROWS and 0 <= column < GRID_COLUMNS #TERESA
+    ## TERESA BELOW TESTING ##
+    within_bounds = (0 <= row < GRID_ROWS) and (0 <= column < GRID_COLUMNS)
+    print(f"Checking valid: ({row}, {column}) within bounds: {within_bounds}")
+    return within_bounds
+
 
 # Checks if the destination can be accessed - returns boolean
 #NICKY
@@ -36,7 +43,12 @@ def valid(row, column):
     return grid[row][column] == 0"""
 def unblocked(grid, column, row):
     #print(f"CURRENT ROW COL{row},{column},{grid[row][column]}")
-    return grid[row][column] == 0
+    #return grid[row][column] == 0 #TERESA 
+    ## TERESA BELOW TESTING ##
+    is_unblocked = grid[row][column] == 0  # assuming 0 is a free cell
+    print(f"Checking unblocked: ({row}, {column}) is {'free' if is_unblocked else 'an obstacle'}")
+    return is_unblocked
+
 
 # Checks if we have reached the destination
 def dest_reach(row, column, destination):
