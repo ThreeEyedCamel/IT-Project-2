@@ -8,8 +8,11 @@ import numpy as np
 
 class Cell:
     def __init__(self):
-        self.p_row = 0  # Parent cell's row index
-        self.p_column = 0  # Parent cell's column index
+        #NICKY BELOW
+        """self.p_row = 0  # Parent cell's row index
+        self.p_column = 0  # Parent cell's column index"""
+        self.p_row = -1  # Parent cell's row index
+        self.p_column = -1  # Parent cell's column index
         self.t_cost = float('inf')  # Total cost of the cell (g + h)
         self.s_cost = float('inf')  # Cost from start to this cell
         self.h_cost = 0  # Heuristic cost from this cell to destination
@@ -28,7 +31,8 @@ def valid(row, column):
     return 0 <= row < GRID_ROWS and 0 <= column < GRID_COLUMNS
 
 # Checks if the destination can be accessed - returns boolean
-def unblocked(grid, row, column):
+def unblocked(grid, column, row):
+    print(f"CURRENT ROW COL{row},{column},{grid[row][column]}")
     return grid[row][column] == 0
 
 # Checks if we have reached the destination
@@ -43,25 +47,43 @@ def h_value(row, column, destination):
     DX = dest_x - column # DX is how far away on the X axis the destination is from the current position
     DY = dest_y - row # DY is how far away on the Y axis the destination is from the current position
     return sqrt(DX ** 2 + DY ** 2)
+#NICKY
+def trace_path(end, cell_details):
+    path = []
+    row, col = end
+    while not (cell_details[row][col].p_row == row and cell_details[row][col].p_column == col):
+        path.append((col, row))
+        temp_row = cell_details[row][col].p_row
+        temp_col = cell_details[row][col].p_column
+        row, col = temp_row, temp_col
+    path.append((col, row))  # Add the start node to the path
+    return path[::-1]  # Reverse the path to get it from start to end
 
-def trace_path(destination, cell_details):
+"""def trace_path(destination, cell_details):
+    
+    print("Cell details", type(cell_details)) #NICKY
+    print("destination", destination) #NICKY
     row = destination[0]
     column = destination[1]
     path = []
     while not (cell_details[row][column].p_row == row and cell_details[row][column].p_column == column):
         cell = (cell_details[row][column].p_row, cell_details[row][column].p_column)  #Start edit cells
+        print("path", path)#NICKY
+        print(f"Cell length: {len(cell)}")#Nicky
         path.append(cell[::-1])  # Add this one to the path
         temp_row = cell_details[row][column].p_row # Re-assigning
         row = temp_row
         temp_column = cell_details[row][column].p_column
         column = temp_column
+
+    print("WHAT",path) #NICKY
     path.reverse()  # Reversing path as we went from destination to source
     #path.append(start)
     path.append((destination[0], destination[1])) # Adding the destination in the path # just changed
     # print(f"reconstructed path: {path}") # testing
     print(path)
     print(f"path length: {len(path)}")
-    return path
+    return path"""
 
 """def a_star(grid, start, end):
     print("Starting A* algorithm...")
@@ -121,11 +143,15 @@ def trace_path(destination, cell_details):
 """
 
 def a_star(grid, start, end):
+    print(grid)
     #A* Function: This checks given source and dest are valid and not blocked.
 
+    #NICKY - this is the reason the coords are backwards in ASTAR
     start = start[::-1]
     print("The start node is:", start)
     end = end[::-1]
+    
+
 
 
 
@@ -142,20 +168,27 @@ def a_star(grid, start, end):
     if dest_reach(start[0], start[1], end):
         print("You are already at the destination!")
         return [start]
-
+    
+    i, j = start#NICKY
     # Initialise the list to store the visited cells and the details (x and y values) of each cell
     closed_list = [[False for _ in range(GRID_COLUMNS)] for _ in range(GRID_ROWS)]
-    cell_details = [[Cell() for _ in range(GRID_COLUMNS)] for _ in range(GRID_ROWS)]
+    cell_details = [[Cell() for _ in range(GRID_COLUMNS)] for _ in range(GRID_ROWS)] 
+    #cell_details = [] #NICKY
+    print(f"grid columns{GRID_COLUMNS}, grid rows{GRID_ROWS}")#NICKY
+    #print(f"Cell details: {cell_details}")#NICKY
 
     # Initialise the start cell details and the list that will contain cells to be visited
     i, j = start
+    print(f"FIRST i{i}, j{j}")#nicky
+    cell_details[i][j].p_row = i
+    cell_details[i][j].p_column = j
     cell_details[i][j].s_cost = 0.0
     cell_details[i][j].h_cost = h_value(i, j, end)
     cell_details[i][j].t_cost = cell_details[i][j].s_cost + cell_details[i][j].h_cost
-    cell_details[i][j].p_row = i
-    cell_details[i][j].p_column = j
+    
 
     open_list = [(0.0, i, j)]
+    
     heapq.heapify(open_list)
     found_dest = False  # Initialise the Boolean flag that says if the destination has been reached
 
@@ -169,14 +202,22 @@ def a_star(grid, start, end):
         for direction in directions:
             next_i, next_j = i + direction[0], j + direction[1]
             # Check the next cell is valid, not blocked, not the destination (If it is, you're done give a success message)
-            if valid(next_i, next_j):
+            if valid(next_i, next_j) == True and unblocked(grid, next_i, next_j) == True: #Nicky added == true and unblocked
                 # print(f"Neighbour : ({next_i}, {next_j})") # testing
                 if dest_reach(next_i, next_j, end):
                     print(f"Destination reached: ({next_i},{next_j})")  # Debug
+                    print(f"LAST i: {i}, j: {j}")#nicky
                     cell_details[next_i][next_j].p_row = i
                     cell_details[next_i][next_j].p_column = j
                     found_dest = True
                     #print("checking if a_star_functions.dest_reached is running")  # testing
+                    """a = trace_path(end, cell_details)#Nicky
+                    print(f"trace path: {a}")#Nicky"""
+                    #print(f"open list: {open_list}")#nicky
+                    #Nicky below
+                    """for i in cell_details:
+                        print(f"PRINTING CELL{cell_details[next_i][next_j].p_row}")""" #NICKY
+                    print(trace_path(end, cell_details))#Nicky
                     return trace_path(end, cell_details)  # Calling trace_path function
                 elif not closed_list[next_i][next_j] and unblocked(grid, next_i, next_j):
                     # Calculate which of the next available cells has the lowest f value
@@ -193,6 +234,7 @@ def a_star(grid, start, end):
                         cell_details[next_i][next_j].h_cost = h_new
                         cell_details[next_i][next_j].p_row = i
                         cell_details[next_i][next_j].p_column = j
+                        #print(f"Next i: {i}, next j: {j}")#NICKY
     # If we cant find the destination - give an unsuccessful message
     if not found_dest:
         raise Exception("This program has unfortunately failed to find the destination cell :(")

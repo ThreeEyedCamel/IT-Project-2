@@ -370,6 +370,7 @@ class MazeEditor(tk.Tk):
                                      )
 
     def animate_moves(self, moveset, index=0):
+        print(f"moveset {moveset}")#nicky
         try:
             print(f"animate move {moveset[index]}, index={index}")
             if index < len(moveset):
@@ -449,6 +450,7 @@ class MazeEditor(tk.Tk):
         :return:
         """
         if self.start_coords == (-1, -1) or self.finish_coords == (-1, -1):
+            
             return None
 
         self.disable_buttons()
