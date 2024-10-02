@@ -1,9 +1,12 @@
+# teresa made an edit # disregarded all edits bc did not work rip
+
 import tkinter as tk
 from tkinter import * 
 import re
 import os
 from PIL import Image, ImageTk
 from algorithms import a_algorithm, rrt
+import threading #teresa
 
 
 class MazeEditor(tk.Tk):
@@ -98,6 +101,15 @@ class MazeEditor(tk.Tk):
         self.button_import.grid(row=0, column=6, padx=5, pady=5)
         self.button_label_import = tk.Label(self.button_frame, text="Import Maze")
         self.button_label_import.grid(row=1, column=6)
+
+        ##  TERESA TRYING SOMETHING ##
+        """self.canvas = Canvas(self.master, width=500, height=500)
+        self.canvas.pack()
+        self.grid_size = 10
+        self.grid = [[0 for _ in range(self.grid_size)] for _ in range(self.grid_size)]
+        self.start = None
+        self.end = None"""
+        ## TERESA TRYING SOMETHING ##
 
         # self.button_test_animation = tk.Button(self.button_frame, text="Test Animation", command=self.animate_path_test)
         # self.button_test_animation.grid(row=0, column=8, padx=5, pady=5)
@@ -461,7 +473,6 @@ class MazeEditor(tk.Tk):
         self.animate_moves(moveset)
 
         self.after(self.animation_delay * (1 + len(moveset)), self.enable_buttons)
-
 
     
 
