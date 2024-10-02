@@ -31,8 +31,11 @@ def valid(row, column):
     return 0 <= row < GRID_ROWS and 0 <= column < GRID_COLUMNS
 
 # Checks if the destination can be accessed - returns boolean
+#NICKY
+"""def unblocked(grid, row, column):
+    return grid[row][column] == 0"""
 def unblocked(grid, column, row):
-    print(f"CURRENT ROW COL{row},{column},{grid[row][column]}")
+    #print(f"CURRENT ROW COL{row},{column},{grid[row][column]}")
     return grid[row][column] == 0
 
 # Checks if we have reached the destination
@@ -169,7 +172,7 @@ def a_star(grid, start, end):
         print("You are already at the destination!")
         return [start]
     
-    i, j = start#NICKY
+    #i, j = start#NICKY
     # Initialise the list to store the visited cells and the details (x and y values) of each cell
     closed_list = [[False for _ in range(GRID_COLUMNS)] for _ in range(GRID_ROWS)]
     cell_details = [[Cell() for _ in range(GRID_COLUMNS)] for _ in range(GRID_ROWS)] 
@@ -218,6 +221,7 @@ def a_star(grid, start, end):
                     """for i in cell_details:
                         print(f"PRINTING CELL{cell_details[next_i][next_j].p_row}")""" #NICKY
                     print(trace_path(end, cell_details))#Nicky
+                    
                     return trace_path(end, cell_details)  # Calling trace_path function
                 elif not closed_list[next_i][next_j] and unblocked(grid, next_i, next_j):
                     # Calculate which of the next available cells has the lowest f value
