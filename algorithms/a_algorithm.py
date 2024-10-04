@@ -39,6 +39,7 @@ def valid(row, column):
 #NICKY
 def unblocked(grid, column, row):
     #print(f"CURRENT ROW COL{row},{column},{grid[row][column]}")
+    
     return grid[row][column] == 0 #TERESA 
 
 
@@ -67,6 +68,11 @@ def trace_path(end, cell_details):
     return path[::-1]  # Reverse the path to get it from start to end
 
 def a_star(grid, start, end):
+    #NICKY
+    for x, row in enumerate(grid):
+        for y, value in enumerate(row):
+            if value ==1 and x !=0 and x!=31 and y!=41 and y !=0:
+                print (f"location: {x}, {y}")
     print(grid)
     #A* Function: This checks given source and dest are valid and not blocked.
 
