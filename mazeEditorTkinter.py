@@ -272,6 +272,7 @@ class MazeEditor(tk.Tk):
         x = event.x // self.cell_size
         y = event.y // self.cell_size
         if 0 <= x < self.grid_width + 2 and 0 <= y < self.grid_height + 2:
+            print(f"TERESA Drawing at coordinates: ({x}, {y})")  ##teresa debugging
             # Reset start/finish coords
             if self.maze_matrix[y][x] == 2:
                 self.start_coords = (-1, -1)
@@ -317,6 +318,30 @@ class MazeEditor(tk.Tk):
                 )
                 print(self.start_coords)
 
+    def place_start(self, event):
+        if (self.start_coords[0] < 0) and (self.start_coords[1] < 0):
+            x = event.x // self.cell_size
+            y = event.y // self.cell_size
+            if 1 <= x < self.grid_width + 1 and 1 <= y < self.grid_height + 1:
+                self.maze_matrix[y][x] = 2
+                self.start_coords = (x, y)
+                self.canvas.create_rectangle(
+                    x * self.cell_size,
+                    y * self.cell_size,
+                    (x + 1) * self.cell_size,
+                    (y + 1) * self.cell_size,
+                    fill="green",
+                    tags=(f"cell_{x}_{y}",'maze')
+                )
+                print(self.start_coords)
+    # def place_start(self, event):
+    #     x = event.x // self.cell_size
+    #     y = event.y // self.cell_size
+    #     if 0 <= x < self.grid_width + 2 and 0 <= y < self.grid_height + 2:
+    #         print(f"TERESAPlacing start at: ({x}, {y})")  # Print when start is placed
+    #         self.maze_matrix[y][x] = 2  # Example of placing start
+    #         self.initialise_canvas()  # Refresh canvas to show new start
+            
     def place_finish(self, event):
         if (self.finish_coords[0] < 0) and (self.finish_coords[1] < 0):
             x = event.x // self.cell_size
@@ -333,6 +358,13 @@ class MazeEditor(tk.Tk):
                     tags=(f"cell_{x}_{y}",'maze')
                 )
                 print(self.finish_coords)
+    # def place_finish(self, event):
+    #     x = event.x // self.cell_size
+    #     y = event.y // self.cell_size
+    #     if 0 <= x < self.grid_width + 2 and 0 <= y < self.grid_height + 2:
+    #         print(f"TERESAPlacing finish at: ({x}, {y})")  # Print when finish is placed
+    #         self.maze_matrix[y][x] = 3  # Example of placing finish
+    #         self.initialise_canvas()  # Refresh canvas to show new finish
 
     def export_maze(self):
         with open("savedCourses/maze.txt", "w") as maze_file:
@@ -381,6 +413,21 @@ class MazeEditor(tk.Tk):
                                      tags=(f"cell_{coordinates[0]}_{coordinates[1]}", 'maze')
                                      )
 
+    # def animate_moves(self, moveset, index=0):
+    #     print(f"moveset {moveset}")#nicky
+    #     moveset = moveset[::-1]  # Reverse the moveset if needed
+    #     try:
+    #         if index < len(moveset):
+    #             print(f"animate move {moveset[index]}, index={index}")
+    #             self.update_path(moveset[index])
+    #             # Cheeky way to make sure the next move waits
+    #             self.after(self.animation_delay, self.animate_moves, moveset, index + 1)
+    #         else:
+    #             print("moveset complete")
+    #     except IndexError as e:
+    #         print("Moveset complete,", e)
+
+# original - 
     def animate_moves(self, moveset, index=0):
         print(f"moveset {moveset}")#nicky
         try:
@@ -388,7 +435,7 @@ class MazeEditor(tk.Tk):
             if index < len(moveset):
                 self.update_path(moveset[index])
             # Cheeky way to make sure the next move waits
-            self.after(self.animation_delay, self.animate_moves, moveset, index + 1)
+            self.after(self.animation_delay, self.animate_moves, moveset, index + 1) ##Teresa tabbed this in 
         except IndexError as e:
             print("Moveset complete,", e)
 
