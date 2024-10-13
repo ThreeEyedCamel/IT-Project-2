@@ -44,15 +44,17 @@ def login(username, password):
 
 
 def set_credentials(username, password1, password2):
-    if password1 == password2:
-        if len(password1) >=14 and special_characters(password1) == True and  has_numbers(password1) == True:
-            credentials.append([username, password1])
-            messagebox.showinfo(title="Credentials added", message="Credentials added, please log in")
+    if len(username) > 0 and not any(username in sublist for sublist in credentials):
+        if password1 == password2:
+            if len(password1) >=14 and special_characters(password1) == True and  has_numbers(password1) == True:
+                credentials.append([username, password1])
+                messagebox.showinfo(title="Credentials added", message="Credentials added, please log in")
+            else:
+                messagebox.showinfo(title="Password doesn't meet requirements", message="Password doesn't meet requirements. \n Please try again")
         else:
-            messagebox.showinfo(title="Password doesn't meet requirements", message="Password doesn't meet requirements. \n Please try again")
+            messagebox.showinfo(title="Passwords don't match", message="Passwords don't match. \n Please try again")
     else:
-        messagebox.showinfo(title="Passwords don't match", message="Passwords don't match. \n Please try again")
-
+        messagebox.showinfo(title="Username error", message="Username is either invalid or taken. \n Please try again")
 #Setup main window
 main_window = tkinter.Tk()
 main_window.title("Login")
