@@ -43,12 +43,15 @@ def login(username, password):
 
 
 
-def set_credentials(username, password):
-    if len(password) >=14 and special_characters(password) == True and  has_numbers(password) == True:
-        credentials.append([username, password])
-        messagebox.showinfo(title="Credentials added", message="Credentials added, please log in")
+def set_credentials(username, password1, password2):
+    if password1 == password2:
+        if len(password1) >=14 and special_characters(password1) == True and  has_numbers(password1) == True:
+            credentials.append([username, password1])
+            messagebox.showinfo(title="Credentials added", message="Credentials added, please log in")
+        else:
+            messagebox.showinfo(title="Password doesn't meet requirements", message="Password doesn't meet requirements. \n Please try again")
     else:
-        messagebox.showinfo(title="Password doesn't meet requirements", message="Password doesn't meet requirements. \n Please try again")
+        messagebox.showinfo(title="Passwords don't match", message="Passwords don't match. \n Please try again")
 
 #Setup main window
 main_window = tkinter.Tk()
@@ -92,9 +95,11 @@ def credential_window():
     login_Label2 = tkinter.Label(window2, text = "Set Credentials")
     User_Label2 = tkinter.Label(window2, text = "Username: ")
     User_entry2 = tkinter.Entry(window2)
-    Pwd_Label2 = tkinter.Label(window2, text = "Password: ")
+    Pwd_Label1 = tkinter.Label(window2, text = "Password: ")
+    Pwd_Label2 = tkinter.Label(window2, text = "Re-enter password: ")
+    Pwd_entry1 = tkinter.Entry(window2, show = '*')
     Pwd_entry2 = tkinter.Entry(window2, show = '*')
-    set_button2 = tkinter.Button(window2, text = "Set", command=lambda: set_credentials(User_entry2.get(), Pwd_entry2.get()))
+    set_button2 = tkinter.Button(window2, text = "Set", command=lambda: set_credentials(User_entry2.get(), Pwd_entry1.get(), Pwd_entry2.get()))
     login_button2 = tkinter.Button(window2, text = "Login", command=login_window)
     requirements_Label = tkinter.Label(window2, text = "Password must be at least 14 characters \n contain a number and a special character")
 
@@ -103,8 +108,10 @@ def credential_window():
     login_Label2.place(relx=0.5, rely=0, anchor='n')
     User_Label2.place(relx=0.5, rely=0.1, anchor='n')
     User_entry2.place(relx=0.5, rely=0.15, anchor='n')
-    Pwd_Label2.place(relx=0.5, rely=0.25, anchor='n')
-    Pwd_entry2.place(relx=0.5, rely=0.3, anchor='n')
+    Pwd_Label1.place(relx=0.5, rely=0.2, anchor='n')
+    Pwd_entry1.place(relx=0.5, rely=0.25, anchor='n')
+    Pwd_Label2.place(relx=0.5, rely=0.3, anchor='n')
+    Pwd_entry2.place(relx=0.5, rely=0.35, anchor='n')
     set_button2.place(relx=0.5, rely=0.4, anchor='n')
     login_button2.place(relx=0.5, rely=0.45, anchor='n')
     requirements_Label.place(relx=0.5, rely=0.5, anchor='n')
