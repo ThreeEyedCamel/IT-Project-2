@@ -1,30 +1,54 @@
 #https://www.youtube.com/watch?v=MeMCBdnhvQs
+import re
 import tkinter
+from tkinter import messagebox
 import mazeEditorTkinter
 
-credentials = [['user', 'pwd'],
-               ['user2', 'pwd2']
+credentials = [['user', 'pass12345678910!'],
+               ['user2', 'pass12345678910!']
 ]
+
+def has_numbers(string):
+    return bool(re.search(r'\d', string))
+
+
+def special_characters(string):
+    characters = "!@#$%^&*()-+?_=,<>/"
+    if any(i in characters for i in string):
+        result = True
+    else:
+        result = False
+    return result
 
 
 #Create login function
 def login(username, password):
-    print(username, password)
     valid = False
     for user, pwd in credentials:
         if user == username and pwd == password:
             valid = True
-            print("Login success!!")
             break
         else:
-            print("Login Failed")
+            valid == False
+            
     if valid == True:
+        messagebox.showinfo(title="Login Success", message="Login successful!")
+        print("Login success!!")
         main_window.destroy()
         app = mazeEditorTkinter.MazeEditor()
         app.mainloop()
+    else:
+        print("Login Failed")
+        messagebox.showinfo(title="Login Failed", message="Login Failed, please try again")
+
+
 
 def set_credentials(username, password):
-    credentials.append([username, password])
+    if len(password) >=14 and special_characters(password) == True and  has_numbers(password) == True:
+        credentials.append([username, password])
+        messagebox.showinfo(title="Credentials added", message="Credentials added, please log in")
+    else:
+        messagebox.showinfo(title="Password doesn't meet requirements", message="Password doesn't meet requirements. \n Please try again")
 
 #Setup main window
 main_window = tkinter.Tk()
@@ -42,6 +66,7 @@ def login_window():
     User_entry = tkinter.Entry(window)
     Pwd_Label = tkinter.Label(window, text = "Password: ")
     Pwd_entry = tkinter.Entry(window, show = '*')
+    
 
    
 
@@ -54,6 +79,7 @@ def login_window():
     Pwd_Label.place(relx=0.5, rely=0.25, anchor='n')
     Pwd_entry.place(relx=0.5, rely=0.3, anchor='n')
     login_button.place(relx=0.5, rely=0.4, anchor='n')
+    
 
 
 
@@ -70,6 +96,9 @@ def credential_window():
     Pwd_entry2 = tkinter.Entry(window2, show = '*')
     set_button2 = tkinter.Button(window2, text = "Set", command=lambda: set_credentials(User_entry2.get(), Pwd_entry2.get()))
     login_button2 = tkinter.Button(window2, text = "Login", command=login_window)
+    requirements_Label = tkinter.Label(window2, text = "Password must be at least 14 characters \n contain a number and a special character")
+
+
     #Placing components
     login_Label2.place(relx=0.5, rely=0, anchor='n')
     User_Label2.place(relx=0.5, rely=0.1, anchor='n')
@@ -78,6 +107,7 @@ def credential_window():
     Pwd_entry2.place(relx=0.5, rely=0.3, anchor='n')
     set_button2.place(relx=0.5, rely=0.4, anchor='n')
     login_button2.place(relx=0.5, rely=0.45, anchor='n')
+    requirements_Label.place(relx=0.5, rely=0.5, anchor='n')
 
 
 
