@@ -6,14 +6,10 @@ import re
 from tkinter import *
 import tkinter as tk
 import mazeEditorTkinter
+# event object for stopping thread
+event_obj = threading.Event()
 
-def gui():
-    # Launch mazeEditorTkinter.MazeEditor
-    app = mazeEditorTkinter.MazeEditor()
-    app.mainloop()
-"""def on_close(name):
-        # This function will be executed when the main window is closed
-        name.quit()"""
+#Setting up the userdata database
 def security_setup():
     conn = sqlite3.connect("userdata.db")
     cur = conn.cursor()
@@ -42,11 +38,9 @@ def security_setup():
     result = cur.fetchall()
     print(result)
     conn.close()
-
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(("localhost", 9999))
 server.listen()
-
 def update_userdata(username, password):
     conn = sqlite3.connect("userdata.db")
     cur = conn.cursor()
@@ -59,18 +53,18 @@ def update_userdata(username, password):
     """)
 
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    print(hashed_password)
     cur.execute("INSERT INTO userdata(username, password) VALUES(?,?)", (username, hashed_password))
     conn.commit()
     conn.close()
 
 def handle_connection(c):
-    print("Handle connection")
     def on_submit():
         username = inputUser.get(1.0, "end-1c")
         password = inputP1.get(1.0, "end-1c")
         connection_result(c, username, password)
 
-    root4 = tk.Toplevel() #difference
+    root4 = Tk()
     root4.title("Set Credentials")
     root4.geometry("500x500+50+50")
 
@@ -92,31 +86,39 @@ def handle_connection(c):
 
 def connection_result(c, username, password):
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    print(f"Debug: Username: {username}, Password: {hashed_password}")
     conn = sqlite3.connect("userdata.db")
     cur = conn.cursor()
     cur.execute("SELECT * FROM userdata WHERE username = ? AND password = ?", (username, hashed_password))
+    #cur.execute("SELECT * FROM userdata")
     result = cur.fetchall()
+    print(f"Debug: Query Result: {result}")
+    print(type(result))
     success = False
     if result:
         msg = "Login successful!"
         success = True
-        #root.quit
-        # gui()  # Close current and open the new application
+        #event_obj.clear() # clear the state
+        # GUI Integration
+        
+
     else:
         msg = "Login FAILED"
-
-    result_window = tk.Toplevel()#difference
-    Label(result_window, text=msg).pack()
+    root5 = Tk()
+    Label(root5, text=msg).pack()
     c.send(msg.encode())
-    #result_window.protocol("WM_DELETE_WINDOW", on_close(result_window))
-    result_window.mainloop()
-    result_window.quit
+    root5.mainloop()
+    root5.quit
+    #print(success)
     if success == True:
-        result_window.destroy()
-        gui()
+        print("enter success")
+        print("enter success1")
+        app = mazeEditorTkinter.MazeEditor()
+        print("enter success2")
+        app.mainloop()
+    
 
 def client():
-    print("Client")
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(("localhost", 9999))
 
@@ -131,7 +133,6 @@ def client():
 def start_server():
     print("Server is listening...")
     while True:
-        print("1")
         client, addr = server.accept()
         threading.Thread(target=handle_connection, args=(client,)).start()
 
@@ -149,55 +150,49 @@ def special_characters(string):
     return any(i in characters for i in string)
 
 def first_window():
-    root = Tk() #Difference - what
-    root.title("Choice")
+    root1 = Tk()
+    root1.title("Choice")
 
-    tk.Button(root, text="Set credentials", command=set_credentials).place(relx=0.5, rely=0.2, anchor='n')
-    tk.Button(root, text="Login", command=main).place(relx=0.5, rely=0.4, anchor='n')
+    tk.Button(root1, text="Set credentials", command=set_credentials).place(relx=0.5, rely=0.2, anchor='n')
+    tk.Button(root1, text="Login", command=main).place(relx=0.5, rely=0.4, anchor='n')
 
-    root.mainloop()
-    root.destroy()
-    #root.protocol("WM_DELETE_WINDOW", on_close(root))
+    root1.mainloop()
 
 def set_credentials():
-    credentials_window = tk.Toplevel() #difference
-    credentials_window.title("Set Credentials")
-    credentials_window.geometry("500x500+50+50")
-    #credentials_window.protocol("WM_DELETE_WINDOW", on_close(credentials_window))
+    root = Tk()
+    root.title("Set Credentials")
+    root.geometry("500x500+50+50")
 
-    Label(credentials_window, text="Login").pack()
-    Label(credentials_window, text="Username:").place(relx=0.5, rely=0.05, anchor='n')
-    Label(credentials_window, text="Password:").place(relx=0.5, rely=0.2, anchor='n')
-    Label(credentials_window, text="Re-enter password: ").place(relx=0.5, rely=0.35, anchor='n')
-    Label(credentials_window, text="Password requirements:\n 10 characters long \n Contains numbers \n Contains a special character").place(relx=0.5, rely=0.8, anchor='n')
+    Label(root, text="Login").pack()
+    Label(root, text="Username:").place(relx=0.5, rely=0.05, anchor='n')
+    Label(root, text="Password:").place(relx=0.5, rely=0.2, anchor='n')
+    Label(root, text="Re-enter password: ").place(relx=0.5, rely=0.35, anchor='n')
+    Label(root, text="Password requirements:\n 10 characters long \n Contains numbers \n Contains a special character").place(relx=0.5, rely=0.8, anchor='n')
 
-    inputUser = tk.Text(credentials_window, height=2, width=20)
-    inputP1 = tk.Text(credentials_window, height=2, width=20)
-    inputP2 = tk.Text(credentials_window, height=2, width=20)
+    inputUser = tk.Text(root, height=2, width=20)
+    inputP1 = tk.Text(root, height=2, width=20)
+    inputP2 = tk.Text(root, height=2, width=20)
 
     def on_submit():
         verify(inputUser.get(1.0, "end-1c"), inputP1.get(1.0, "end-1c"), inputP2.get(1.0, "end-1c"))
 
-    tk.Button(credentials_window, text="Submit", command=on_submit).place(relx=0.5, rely=0.6, anchor='n')
+    tk.Button(root, text="Submit", command=on_submit).place(relx=0.5, rely=0.6, anchor='n')
 
     inputUser.place(relx=0.5, rely=0.1, anchor='n')
     inputP1.place(relx=0.5, rely=0.25, anchor='n')
     inputP2.place(relx=0.5, rely=0.4, anchor='n')
 
-    credentials_window.mainloop()
-    #credentials_window.destroy()
+    root.mainloop()
 
 def verify(user, pass1, pass2):
-    verification_window = tk.Toplevel()
-    #verification_window.protocol("WM_DELETE_WINDOW", on_close(verification_window))
+    root3 = Tk()
     if pass1 == pass2 and len(pass1) >= 10 and has_numbers(pass1) and special_characters(pass1):
         update_userdata(user, pass1)
-        Label(verification_window, text="Credentials added").pack()
+        Label(root3, text="Credentials added").pack()
     else:
-        Label(verification_window, text="Password doesn't meet requirements").pack()
+        Label(root3, text="Password doesn't meet requirements").pack()
 
-    verification_window.mainloop()
-    verification_window.destroy()
+    root3.mainloop()
 
 if __name__ == "__main__":
     first_window()
