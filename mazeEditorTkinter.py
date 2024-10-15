@@ -1,9 +1,13 @@
+import heapq
 import tkinter as tk
 from tkinter import *
 import re
 import os
+
+import numpy as np
 from PIL import Image, ImageTk
-from algorithms import a_algorithm, rrt
+from algorithms import a_algorithm, rrt, dijkstra
+from algorithms.dijkstra import Dijkstra
 
 
 class MazeEditor(tk.Tk):
@@ -17,6 +21,8 @@ class MazeEditor(tk.Tk):
         self.canvas_width = (self.grid_width + 2) * self.cell_size
         self.canvas_height = (self.grid_height + 2) * self.cell_size
         self.animation_delay = 100
+        self.animation_delay_views = 1
+        self.animation_delay_moves = 50
         # Initialise matrix
         self.maze_matrix = None
         self.create_matrix(self.grid_width, self.grid_height)
@@ -122,6 +128,17 @@ class MazeEditor(tk.Tk):
         self.algorithm_parameters = [self.grid_width, self.grid_height, self.maze_matrix,
                                      self.start_coords, self.finish_coords]
 
+        bush_image = Image.open(r"icons/bush.png",)
+        bush_image = bush_image.resize((self.cell_size, self.cell_size), Image.Resampling.LANCZOS)
+        bush_image = ImageTk.PhotoImage(bush_image)
+        self.bush_image = bush_image
+
+
+        path_image = Image.open(r"icons/gravel.png",)
+        path_image = path_image.resize((self.cell_size, self.cell_size), Image.Resampling.LANCZOS)
+        path_image = ImageTk.PhotoImage(path_image)
+        self.path_image = path_image
+
         print("--Debug-- init function complete")  # Debug
 
     def create_matrix(self, matrix_width, matrix_height):
@@ -148,7 +165,7 @@ class MazeEditor(tk.Tk):
                                (x + 1) * self.cell_size,
                                (y + 1) * self.cell_size)
                 if self.maze_matrix[y][x] == 1:
-                    self.canvas.create_rectangle(square_dims, fill="black", tags=(f"cell_{x}_{y}", 'maze'))
+                    self.canvas.create_rectangle(square_dims, fill="black", tags=(f"cell_{x}_{y}", 'maze', 'special'))
                 if self.maze_matrix[y][x] == 2:
                     self.canvas.create_rectangle(square_dims, fill="green")
                     self.start_coords = (x, y)
@@ -266,13 +283,11 @@ class MazeEditor(tk.Tk):
             if self.maze_matrix[y][x] == 3:
                 self.finish_coords = (-1, -1)
             self.maze_matrix[y][x] = 1
-            self.canvas.create_rectangle(
-                x * self.cell_size,
-                y * self.cell_size,
-                (x + 1) * self.cell_size,
-                (y + 1) * self.cell_size,
-                fill="black",
-                tags=(f"cell_{x}_{y}", 'maze')
+            self.canvas.create_image(
+                x * self.cell_size + self.cell_size // 2,  # Center the image in the cell
+                y * self.cell_size + self.cell_size // 2,
+                image=self.bush_image,
+                tags=(f"cell_{x}_{y}", 'maze','special')
             )
 
     def erase(self, event):
@@ -301,7 +316,7 @@ class MazeEditor(tk.Tk):
                     (x + 1) * self.cell_size,
                     (y + 1) * self.cell_size,
                     fill="green",
-                    tags=(f"cell_{x}_{y}",'maze')
+                    tags=(f"cell_{x}_{y}",'maze', 'special')
                 )
                 print(self.start_coords)
 
@@ -318,12 +333,12 @@ class MazeEditor(tk.Tk):
                     (x + 1) * self.cell_size,
                     (y + 1) * self.cell_size,
                     fill="red",
-                    tags=(f"cell_{x}_{y}",'maze')
+                    tags=(f"cell_{x}_{y}",'maze','special')
                 )
                 print(self.finish_coords)
 
     def export_maze(self):
-        with open("savedCourses/maze.txt", "w") as maze_file:
+        with open("savedCourses/wegsmaze.txt", "w") as maze_file:
             for row in self.maze_matrix:
                 maze_file.write(str(row) + "\n")
                 print(row)
@@ -351,6 +366,18 @@ class MazeEditor(tk.Tk):
 
     def update_path(self, coordinates):
         print(f"Update cell ({coordinates})")
+
+        cell_tag = f"cell_{coordinates[0]}_{coordinates[1]}"
+
+        items = self.canvas.find_withtag(cell_tag)
+        if items:
+            for item in items:
+                if 'special' in self.canvas.gettags(item):
+                    print(f"Skipping cell {coordinates} because it has the 'special' tag.")
+                    return  # Skip drawing over this cell if it has the 'special' tag
+
+
+
         self.canvas.create_rectangle(coordinates[0] * self.cell_size,
                                      coordinates[1] * self.cell_size,
                                      (coordinates[0] + 1) * self.cell_size,
@@ -361,6 +388,16 @@ class MazeEditor(tk.Tk):
 
     def update_searched(self, coordinates):
         print(f"Searched cell ({coordinates})")
+        cell_tag = f"cell_{coordinates[0]}_{coordinates[1]}"
+
+        # Check if the cell has the 'special' tag
+        items = self.canvas.find_withtag(cell_tag)
+        if items:
+            for item in items:
+                if 'special' in self.canvas.gettags(item):
+                    print(f"Skipping cell {coordinates} because it has the 'special' tag.")
+                    return
+
         self.canvas.create_rectangle(coordinates[0] * self.cell_size,
                                      coordinates[1] * self.cell_size,
                                      (coordinates[0] + 1) * self.cell_size,
@@ -369,64 +406,23 @@ class MazeEditor(tk.Tk):
                                      tags=(f"cell_{coordinates[0]}_{coordinates[1]}", 'maze')
                                      )
 
-    def animate_moves(self, moveset, index=0):
-        """
-        Animates path without needing a viewset.
+    def animate_algorithm(self, explored_points_all, path):
+        # Animate searched points
+        self.animate_searched_points(explored_points_all, 0, path)
 
-        :param moveset:
-        :param index:
-        :return:
-        """
-        try:
-            print(f"animate move {moveset[index]}, index={index}")
-            if index < len(moveset):
-                self.update_path(moveset[index])
-            # Cheeky way to make sure the next move waits
-            self.after(self.animation_delay, self.animate_moves, moveset, index + 1)
-        except IndexError as e:
-            print("Moveset complete,", e)
+    def animate_searched_points(self, explored_points, index, path):
+        if index < len(explored_points):
+            self.update_searched(explored_points[index])
+            self.after(self.animation_delay_views,
+                       lambda: self.animate_searched_points(explored_points, index + 1, path))
+        else:
+            # Once all searched points are shown, animate the path
+            self.animate_path_algorithm(path)
 
-    def animate_moves_views(self, moveset, viewset, index=0):
-        """
-        Animates the 'path' of the agent in grey.
-
-        :param moveset: List of two-integer lists representing coordinates visited by agent
-        :type moveset: list[tuple[int]]
-        :param viewset: For every move: list of two-integer lists representing coordinates viewed by agent
-        :type viewset: list[list[tuple[int]]]
-        :param index: Counter
-        :type index: int
-        :return: None
-        """
-        try:
-            print(f"animate move {moveset[index]}, index={index}")
-            if index < len(moveset):
-                self.update_path(moveset[index])
-                self.after(self.animation_delay, self.animate_views, viewset, index)
-            # Cheeky way to make sure the next move waits
-            self.after(self.animation_delay * (1 + len(viewset[index])), self.animate_moves_views, moveset, viewset, index + 1)
-        except IndexError as e:
-            print("Moveset complete", e)
-
-    def animate_views(self, viewset, index, subindex=0):
-        """
-        Animates the 'searched' areas of the agent in grey.
-
-        :param viewset: For every move: list of two-integer lists representing coordinates viewed by agent
-        :type viewset: list[list[tuple[int]]]
-        :param index: References the move that applies to the corresponding viewset
-        :type index: int
-        :param subindex: References coordinate pairs within viewset
-        :type subindex: int
-        :return: None
-        """
-        try:
-            print(f"animate view {viewset[index][subindex]}, index={index}, subindex={subindex}")
-            if subindex < len(viewset[index]):
-                self.update_searched(viewset[index][subindex])
-            self.after(self.animation_delay, self.animate_views, viewset, index, subindex + 1)
-        except IndexError as e:
-            print("Viewset complete,", e)
+    def animate_path_algorithm(self, path, index=0):
+        if index < len(path):
+            self.update_path(path[index])
+            self.after(self.animation_delay_moves, lambda: self.animate_path_algorithm(path, index + 1))
 
     def animate_path_test(self):
         """
@@ -460,12 +456,18 @@ class MazeEditor(tk.Tk):
 
         self.disable_buttons()
         # moveset = a_algorithm.a_star(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # A* test
-        moveset = rrt.rapidly_exploring_random_tree(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # RRT test
+        path, explored_points_all = rrt.rapidly_exploring_random_tree(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # RRT test
 
-        print(moveset)
-        self.animate_moves(moveset)
+        #path, explored_points_all = self.dijkstra(self.start_coords, self.finish_coords)
 
-        self.after(self.animation_delay * (1 + len(moveset)), self.enable_buttons)
+        #dijkstra_instance = Dijkstra(self.maze_matrix, self.grid_width, self.grid_height)
+        #path, explored_points_all = dijkstra_instance.dijkstra(self.start_coords, self.finish_coords)
+        self.animate_algorithm(explored_points_all, path)
+
+        #final_path, visited_nodes = bfs.breadth_first_search(self.maze_matrix, self.start_coords, self.finish_coords)
+
+
+        self.enable_buttons()
 
     # def execute_algorithm(self):
     #     """
