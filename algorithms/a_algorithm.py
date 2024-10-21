@@ -83,8 +83,12 @@ def trace_path(destination, cell_details):
     return path
 
 
-def a_star(grid, start, end):
-    """A* Function: This checks given source and dest are valid and not blocked."""
+def astar(grid, start, end):
+    """
+    A* Function: This checks given source and dest are valid and not blocked.
+
+    rename this function to algorithm if we get a star working.
+    """
 
     start = start[::-1]
     end = end[::-1]
@@ -196,7 +200,7 @@ def main():  # ignore the red line lol
         # print(source, "is currently the start point. While", destination, "is the end point.")
         # print("---")  # testing purposes - so i can spatially read it
 
-        path = a_star(grid, source, destination)  # Calling a_star which calls trace_path
+        path = algorithm(grid, source, destination)  # Calling a_star which calls trace_path
         if path:
             print("This is the path using A*: ", path)
         else:

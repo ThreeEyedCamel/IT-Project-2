@@ -3,10 +3,10 @@ import numpy as np
 
 
 class Dijkstra:
-    def __init__(self, maze_matrix, grid_width, grid_height, start, goal):
+    def __init__(self, maze_matrix, start, goal):
         self.maze_matrix = maze_matrix
-        self.grid_width = grid_width
-        self.grid_height = grid_height
+        self.grid_width = len(maze_matrix[0]) - 2
+        self.grid_height = len(maze_matrix) - 2
         self.start = start
         self.goal = goal
 
@@ -73,6 +73,6 @@ class Dijkstra:
         return None, explored_points_all
 
 
-def algorithm(maze_matrix, grid_width, grid_height, start_coords, finish_coords):
-    dijkstra_instance = Dijkstra(maze_matrix, grid_width, grid_height, start_coords, finish_coords)
+def algorithm(maze_matrix, start_coords, finish_coords):
+    dijkstra_instance = Dijkstra(maze_matrix, start_coords, finish_coords)
     return dijkstra_instance.dijkstra()

@@ -452,8 +452,7 @@ class MazeEditor(tk.Tk):
 
         if hasattr(module, 'algorithm'):
             print("Algorithm found, executing...")
-            path, explored_points_all = getattr(module, 'algorithm')(self.maze_matrix, self.grid_width,
-                                                                     self.grid_height,
+            path, explored_points_all = getattr(module, 'algorithm')(self.maze_matrix,
                                                                      self.start_coords, self.finish_coords)
 
             if path is None:
