@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-def rapidly_exploring_random_tree(grid, start, end):
+def algorithm(grid, witdth, hright, start, end):
     # Helper function to check if a point is inside the maze and not an obstacle
     def is_free(x, y):
         return 0 <= x < maze.shape[0] and 0 <= y < maze.shape[1] and maze[x, y] != 1

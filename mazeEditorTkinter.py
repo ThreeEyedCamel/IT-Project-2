@@ -1,13 +1,15 @@
 import heapq
 import tkinter as tk
+import tkinter.messagebox
 from tkinter import *
 import re
 import os
+import importlib.util
 
 import numpy as np
 from PIL import Image, ImageTk
-from algorithms import a_algorithm, rrt, dijkstra
-from algorithms.dijkstra import Dijkstra
+
+import algorithms
 
 
 class MazeEditor(tk.Tk):
@@ -33,6 +35,9 @@ class MazeEditor(tk.Tk):
         print("--Debug-- images set")  # Debug
         self.canvas = tk.Canvas(self, width=self.canvas_width, height=self.canvas_height)
         self.canvas.pack()
+
+        self.bush_image = ImageTk.PhotoImage(
+            Image.open(r"icons/bush.png", ).resize((self.cell_size, self.cell_size), Image.Resampling.LANCZOS))
 
         self.initialise_canvas()
 
@@ -105,11 +110,11 @@ class MazeEditor(tk.Tk):
         self.button_label_import = tk.Label(self.button_frame, text="Import Maze")
         self.button_label_import.grid(row=1, column=6)
 
-        # self.button_test_animation = tk.Button(self.button_frame, text="Test Animation", command=self.animate_path_test)
-        # self.button_test_animation.grid(row=0, column=8, padx=5, pady=5)
+        # self.button_execute_algorithm = tk.Button(self.button_frame, text="Test Animation", command=self.animate_path_test)
+        # self.button_execute_algorithm.grid(row=0, column=8, padx=5, pady=5)
 
-        self.button_test_animation = tk.Button(self.button_frame, text="Test Algorithm", command=self.test_algorithm)
-        self.button_test_animation.grid(row=0, column=9, padx=5, pady=5)
+        self.button_execute_algorithm = tk.Button(self.button_frame, text="Run Algorithm", command=self.execute_algorithm)
+        self.button_execute_algorithm.grid(row=0, column=9, padx=5, pady=5)
 
         # Drop-down menu - courses
         file_menu_options = os.listdir(os.getcwd() + "/savedCourses")
@@ -119,22 +124,19 @@ class MazeEditor(tk.Tk):
         file_menu_drop.grid(row=0, column=7, padx=5, pady=5)
 
         # Drop-down menu - algorithms
-        algorithm_menu_options = os.listdir(os.getcwd() + "/algorithms")
+        self.algorithm_menu_options = [x[:-3] for x in os.listdir(os.getcwd() + "/algorithms") if
+                                       os.path.splitext(x)[1] == '.py']
         self.algo_variable = StringVar()
-        self.algo_variable.set(algorithm_menu_options[0])
-        algorithm_menu_drop = OptionMenu(self.button_frame, self.algo_variable, *algorithm_menu_options)
-        algorithm_menu_drop.grid(row=0, column=8, padx=5, pady=5)
+        self.algo_variable.set(self.algorithm_menu_options[0])
+        self.algorithm_menu_drop = OptionMenu(self.button_frame, self.algo_variable, *self.algorithm_menu_options)
+        self.algorithm_menu_drop.grid(row=0, column=8, padx=5, pady=5)
 
         self.algorithm_parameters = [self.grid_width, self.grid_height, self.maze_matrix,
                                      self.start_coords, self.finish_coords]
 
-        bush_image = Image.open(r"icons/bush.png",)
-        bush_image = bush_image.resize((self.cell_size, self.cell_size), Image.Resampling.LANCZOS)
-        bush_image = ImageTk.PhotoImage(bush_image)
-        self.bush_image = bush_image
+        print("bush exists?")
 
-
-        path_image = Image.open(r"icons/gravel.png",)
+        path_image = Image.open(r"icons/gravel.png", )
         path_image = path_image.resize((self.cell_size, self.cell_size), Image.Resampling.LANCZOS)
         path_image = ImageTk.PhotoImage(path_image)
         self.path_image = path_image
@@ -158,6 +160,7 @@ class MazeEditor(tk.Tk):
         """
         print("--Debug-- begin initialise canvas")  # Debug
         self.canvas.create_image(0, 0, image=self.background_image, anchor="nw")
+        print(type(self.bush_image))
         for y in range(len(self.maze_matrix)):
             for x in range(len(self.maze_matrix[0])):
                 square_dims = (x * self.cell_size,
@@ -165,18 +168,24 @@ class MazeEditor(tk.Tk):
                                (x + 1) * self.cell_size,
                                (y + 1) * self.cell_size)
                 if self.maze_matrix[y][x] == 1:
-                    self.canvas.create_rectangle(square_dims, fill="black", tags=(f"cell_{x}_{y}", 'maze', 'special'))
+                    # Bush instead of black squares
+                    # self.canvas.create_rectangle(square_dims, fill="black", tags=(f"cell_{x}_{y}", 'maze', 'special'))
+                    self.canvas.create_image(
+                        x * self.cell_size + self.cell_size // 2,  # Center the image in the cell
+                        y * self.cell_size + self.cell_size // 2,
+                        image=self.bush_image,
+                        tags=(f"cell_{x}_{y}", 'maze', 'special')
+                    )
                 if self.maze_matrix[y][x] == 2:
-                    self.canvas.create_rectangle(square_dims, fill="green")
+                    self.canvas.create_rectangle(square_dims, fill="green", tags=(f"cell_{x}_{y}", 'maze', 'special'))
                     self.start_coords = (x, y)
                     print(f"start coord: {x},{y}")
                 if self.maze_matrix[y][x] == 3:
-                    self.canvas.create_rectangle(square_dims, fill="red")
+                    self.canvas.create_rectangle(square_dims, fill="red", tags=(f"cell_{x}_{y}", 'maze', 'special'))
                     self.finish_coords = (x, y)
                     print(f"finish coord: {x},{y}")
 
         print("--Debug-- initialise canvas complete")  # Debug
-
 
     def draw_mode(self):
         print("draw mode")
@@ -260,7 +269,7 @@ class MazeEditor(tk.Tk):
         self.button_clear.config(state=DISABLED)
         self.button_import.config(state=DISABLED)
         self.button_export.config(state=DISABLED)
-        self.button_test_animation.config(state=DISABLED)
+        self.button_execute_algorithm.config(state=DISABLED)
 
     def enable_buttons(self):
         print("enable buttons")
@@ -271,7 +280,7 @@ class MazeEditor(tk.Tk):
         self.button_clear.config(state=NORMAL)
         self.button_import.config(state=NORMAL)
         self.button_export.config(state=NORMAL)
-        self.button_test_animation.config(state=NORMAL)
+        self.button_execute_algorithm.config(state=NORMAL)
 
     def draw(self, event):
         x = event.x // self.cell_size
@@ -287,7 +296,7 @@ class MazeEditor(tk.Tk):
                 x * self.cell_size + self.cell_size // 2,  # Center the image in the cell
                 y * self.cell_size + self.cell_size // 2,
                 image=self.bush_image,
-                tags=(f"cell_{x}_{y}", 'maze','special')
+                tags=(f"cell_{x}_{y}", 'maze', 'special')
             )
 
     def erase(self, event):
@@ -302,7 +311,6 @@ class MazeEditor(tk.Tk):
             self.maze_matrix[y][x] = 0
             self.canvas.delete(f"cell_{x}_{y}")
 
-
     def place_start(self, event):
         if (self.start_coords[0] < 0) and (self.start_coords[1] < 0):
             x = event.x // self.cell_size
@@ -316,7 +324,7 @@ class MazeEditor(tk.Tk):
                     (x + 1) * self.cell_size,
                     (y + 1) * self.cell_size,
                     fill="green",
-                    tags=(f"cell_{x}_{y}",'maze', 'special')
+                    tags=(f"cell_{x}_{y}", 'maze', 'special')
                 )
                 print(self.start_coords)
 
@@ -333,7 +341,7 @@ class MazeEditor(tk.Tk):
                     (x + 1) * self.cell_size,
                     (y + 1) * self.cell_size,
                     fill="red",
-                    tags=(f"cell_{x}_{y}",'maze','special')
+                    tags=(f"cell_{x}_{y}", 'maze', 'special')
                 )
                 print(self.finish_coords)
 
@@ -375,8 +383,6 @@ class MazeEditor(tk.Tk):
                 if 'special' in self.canvas.gettags(item):
                     print(f"Skipping cell {coordinates} because it has the 'special' tag.")
                     return  # Skip drawing over this cell if it has the 'special' tag
-
-
 
         self.canvas.create_rectangle(coordinates[0] * self.cell_size,
                                      coordinates[1] * self.cell_size,
@@ -424,48 +430,66 @@ class MazeEditor(tk.Tk):
             self.update_path(path[index])
             self.after(self.animation_delay_moves, lambda: self.animate_path_algorithm(path, index + 1))
 
-    def animate_path_test(self):
+    def execute_algorithm(self):
         """
-        Test function containing sample move/viewset
-
+        Main function for executing algorithm
         """
         self.disable_buttons()
-        moveset = [(2, 2), (2, 3), (2, 4), (2, 5)]
-        viewset = [
-            [(3, 2), (2, 3)],
-            [(1, 3), (2, 4)],
-            [(3, 4), (2, 5)],
-            [(1, 5), (2, 6)]
-        ]
-        self.animate_moves_views(moveset, viewset)
-        viewset_length = 0
-        for i in range(len(viewset)):
-            for _ in viewset[i]:
-                viewset_length += 1
 
-        self.after(self.animation_delay * (1 + len(moveset) + viewset_length), self.enable_buttons)
+        if self.start_coords == (-1, -1) or self.finish_coords == (-1, -1):
+            tkinter.messagebox.showerror("Error", "Start and/or Finish not found")
+            print("No start and/or end found, exiting...")
+            self.enable_buttons()
+            return None
+
+        print(self.algo_variable.get())
+        algorithm_file_path = 'algorithms/' + self.algo_variable.get() + '.py'
+        algorithm_module_name = self.algo_variable.get()
+        print(algorithm_module_name)
+        spec = importlib.util.spec_from_file_location(algorithm_module_name, algorithm_file_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        if hasattr(module, 'algorithm'):
+            print("Algorithm found, executing...")
+            path, explored_points_all = getattr(module, 'algorithm')(self.maze_matrix, self.grid_width,
+                                                                     self.grid_height,
+                                                                     self.start_coords, self.finish_coords)
+
+            if path is None:
+                tkinter.messagebox.showerror("Error", "No path found.")
+                self.enable_buttons()
+                return None
+            else:
+                self.animate_algorithm(explored_points_all, path)
+
+        else:
+            tkinter.messagebox.showerror("Error", "Algorithm function not found, please check your algorithm module.")
+            print("No algorithm found, exiting...")
+
+        self.enable_buttons()
 
     def test_algorithm(self):
         """
         Test function for calling algorithms
 
+        Now likely deprecated, all functionality in execute_algorithm
         :return:
         """
+        print(self.algo_variable.get())
+
         if self.start_coords == (-1, -1) or self.finish_coords == (-1, -1):
             return None
 
         self.disable_buttons()
         # moveset = a_algorithm.a_star(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # A* test
-        path, explored_points_all = rrt.rapidly_exploring_random_tree(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # RRT test
+        # path, explored_points_all = algorithms.rrt.algorithm(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # RRT test
 
-        #path, explored_points_all = self.dijkstra(self.start_coords, self.finish_coords)
-
-        #dijkstra_instance = Dijkstra(self.maze_matrix, self.grid_width, self.grid_height)
-        #path, explored_points_all = dijkstra_instance.dijkstra(self.start_coords, self.finish_coords)
+        path, explored_points_all = algorithms.dijkstra.algorithm(self.maze_matrix, self.grid_width, self.grid_height,
+                                                                  self.start_coords, self.finish_coords)
         self.animate_algorithm(explored_points_all, path)
 
-        #final_path, visited_nodes = bfs.breadth_first_search(self.maze_matrix, self.start_coords, self.finish_coords)
-
+        # final_path, visited_nodes = bfs.breadth_first_search(self.maze_matrix, self.start_coords, self.finish_coords)
 
         self.enable_buttons()
 
@@ -475,6 +499,7 @@ class MazeEditor(tk.Tk):
     #     """
     #     self.disable_buttons()
     #     moveset = self.algo_variable(self.maze_matrix, self.start_coords, self.finish_coords)
+
 
 if __name__ == "__main__":
     app = MazeEditor()

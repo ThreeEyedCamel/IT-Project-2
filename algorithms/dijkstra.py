@@ -1,11 +1,14 @@
 import heapq
 import numpy as np
 
+
 class Dijkstra:
-    def __init__(self, maze_matrix, grid_width, grid_height):
+    def __init__(self, maze_matrix, grid_width, grid_height, start, goal):
         self.maze_matrix = maze_matrix
         self.grid_width = grid_width
         self.grid_height = grid_height
+        self.start = start
+        self.goal = goal
 
     def is_free(self, x, y):
         return 0 <= x < self.grid_width + 2 and 0 <= y < self.grid_height + 2 and self.maze_matrix[y][x] != 1
@@ -41,19 +44,19 @@ class Dijkstra:
             path.append(current)
         return path[::-1]  # Keep the order (x, y) as is
 
-    def dijkstra(self, start, goal):
+    def dijkstra(self):
         priority_queue = []
-        heapq.heappush(priority_queue, (0, start))
-        distances = {start: 0}
-        parent_map = {start: None}
+        heapq.heappush(priority_queue, (0, self.start))
+        distances = {self.start: 0}
+        parent_map = {self.start: None}
         explored_points_all = []
 
         while priority_queue:
             current_distance, current_point = heapq.heappop(priority_queue)
             explored_points_all.append(current_point)
 
-            if current_point == goal:
-                return self.extract_path(parent_map, start, goal), explored_points_all
+            if current_point == self.goal:
+                return self.extract_path(parent_map, self.start, self.goal), explored_points_all
 
             # Explore neighbors (4-connected grid)
             for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
@@ -68,3 +71,8 @@ class Dijkstra:
                         heapq.heappush(priority_queue, (new_distance, neighbor))
 
         return None, explored_points_all
+
+
+def algorithm(maze_matrix, grid_width, grid_height, start_coords, finish_coords):
+    dijkstra_instance = Dijkstra(maze_matrix, grid_width, grid_height, start_coords, finish_coords)
+    return dijkstra_instance.dijkstra()
