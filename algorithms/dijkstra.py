@@ -59,7 +59,7 @@ class Dijkstra:
                 return self.extract_path(parent_map, self.start, self.goal), explored_points_all
 
             # Explore neighbors (4-connected grid)
-            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1), (-1,-1), (1,-1), (-1,1), (1,1)]:
                 neighbor = (current_point[0] + dx, current_point[1] + dy)
 
                 if self.is_free(neighbor[0], neighbor[1]) and self.check_line_collision(current_point, neighbor):

@@ -1,15 +1,10 @@
-import heapq
 import tkinter as tk
 import tkinter.messagebox
 from tkinter import *
 import re
 import os
 import importlib.util
-
-import numpy as np
 from PIL import Image, ImageTk
-
-import algorithms
 
 
 class MazeEditor(tk.Tk):
@@ -109,9 +104,6 @@ class MazeEditor(tk.Tk):
         self.button_import.grid(row=0, column=6, padx=5, pady=5)
         self.button_label_import = tk.Label(self.button_frame, text="Import Maze")
         self.button_label_import.grid(row=1, column=6)
-
-        # self.button_execute_algorithm = tk.Button(self.button_frame, text="Test Animation", command=self.animate_path_test)
-        # self.button_execute_algorithm.grid(row=0, column=8, padx=5, pady=5)
 
         self.button_execute_algorithm = tk.Button(self.button_frame, text="Run Algorithm", command=self.execute_algorithm)
         self.button_execute_algorithm.grid(row=0, column=9, padx=5, pady=5)
@@ -238,21 +230,6 @@ class MazeEditor(tk.Tk):
             self.button_erase.config(relief="sunken")
             self.canvas.bind("<B1-Motion>", self.erase)
             self.canvas.bind("<Button-1>", self.erase)
-
-    def button_modes_template(self, button, function):
-        """
-        Honestly this one is kinda useless.
-        """
-        if button.config('relief')[-1] == 'sunken':
-            button.config(relief="raised")
-            self.canvas.unbind("<B1-Motion>")
-            self.canvas.unbind("<Button-1>")
-
-        else:
-            self.raise_all_buttons()
-            button.config(relief="sunken")
-            self.canvas.bind("<B1-Motion>", function)
-            self.canvas.bind("<Button-1>", function)
 
     def raise_all_buttons(self):
         self.button_draw.config(relief="raised")
@@ -467,37 +444,6 @@ class MazeEditor(tk.Tk):
             print("No algorithm found, exiting...")
 
         self.enable_buttons()
-
-    def test_algorithm(self):
-        """
-        Test function for calling algorithms
-
-        Now likely deprecated, all functionality in execute_algorithm
-        :return:
-        """
-        print(self.algo_variable.get())
-
-        if self.start_coords == (-1, -1) or self.finish_coords == (-1, -1):
-            return None
-
-        self.disable_buttons()
-        # moveset = a_algorithm.a_star(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # A* test
-        # path, explored_points_all = algorithms.rrt.algorithm(grid=self.maze_matrix, start=self.start_coords, end=self.finish_coords)  # RRT test
-
-        path, explored_points_all = algorithms.dijkstra.algorithm(self.maze_matrix, self.grid_width, self.grid_height,
-                                                                  self.start_coords, self.finish_coords)
-        self.animate_algorithm(explored_points_all, path)
-
-        # final_path, visited_nodes = bfs.breadth_first_search(self.maze_matrix, self.start_coords, self.finish_coords)
-
-        self.enable_buttons()
-
-    # def execute_algorithm(self):
-    #     """
-    #     Function calls algorithms.
-    #     """
-    #     self.disable_buttons()
-    #     moveset = self.algo_variable(self.maze_matrix, self.start_coords, self.finish_coords)
 
 
 if __name__ == "__main__":
