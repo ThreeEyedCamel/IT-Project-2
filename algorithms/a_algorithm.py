@@ -1,7 +1,4 @@
-# last updated 30th sep teresa
-# nicky updated 2nd oct
-# teresa updating 3rd oct 
-# teresa took out big fat commented areas (left debugging comments tho)
+# updated 22 oct
 
 from math import sqrt
 import heapq
@@ -37,10 +34,9 @@ def valid(row, column):
 
 # Checks if the destination can be accessed - returns boolean
 #NICKY
-def unblocked(grid, column, row):
-    #print(f"CURRENT ROW COL{row},{column},{grid[row][column]}")
+def unblocked(grid, row, col): #BACKWARDS?
     
-    return grid[row][column] == 0 #TERESA 
+    return grid[row][col] != 1 #TERESA 
 
 
 # Checks if we have reached the destination
@@ -60,14 +56,16 @@ def trace_path(end, cell_details):
     path = []
     row, col = end
     while not (cell_details[row][col].p_row == row and cell_details[row][col].p_column == col):
-        path.append((col, row))
+        path.append((col, row))#BACKWARDS?
         temp_row = cell_details[row][col].p_row
         temp_col = cell_details[row][col].p_column
         row, col = temp_row, temp_col
-    path.append((col, row))  # Add the start node to the path
+    path.append((col, row))  # Add the start node to the path #BACKWARDS?
     return path[::-1]  # Reverse the path to get it from start to end
 
-def a_star(grid, start, end):
+def algorithm(grid, start, end):
+    explored_points_all = []
+
     #NICKY
     for x, row in enumerate(grid):
         for y, value in enumerate(row):
@@ -145,7 +143,7 @@ def a_star(grid, start, end):
                         print(f"PRINTING CELL{cell_details[next_i][next_j].p_row}")""" #NICKY
                     print(trace_path(end, cell_details))#Nicky
                     
-                    return trace_path(end, cell_details)  # Calling trace_path function
+                    return trace_path(end, cell_details), explored_points_all  # Calling trace_path function
                 elif not closed_list[next_i][next_j] and unblocked(grid, next_i, next_j):
                     # Calculate which of the next available cells has the lowest f value
                     g_new = cell_details[i][j].s_cost + (1.0 if direction[0] == 0 or direction[1] == 0 else sqrt(2))
@@ -164,6 +162,7 @@ def a_star(grid, start, end):
                         #print(f"Next i: {i}, next j: {j}")#NICKY
     # If we cant find the destination - give an unsuccessful message
     if not found_dest:
-        raise Exception("This program has unfortunately failed to find the destination cell :(")
+        print("This program has unfortunately failed to find the destination cell :(")
+        return None, explored_points_all
 
 # In order to run this algorithm, pass a_star the grid, source and destination\
