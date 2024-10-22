@@ -1,7 +1,4 @@
-# last updated 30th sep teresa
-# nicky updated 2nd oct
-# teresa updating 3rd oct 
-# teresa took out big fat commented areas (left debugging comments tho)
+# updated 22 oct
 
 from math import sqrt
 import heapq
