@@ -141,10 +141,11 @@ def credential_window():
 
 #Main window 
 #Define components
-Welcome_Label = tkinter.Label(main_window, font = ("Arial", 13), text = "Welcome to the Robotic Path Planning GUI!")
-informative_label = tkinter.Label(main_window,  text = "Please login or setup an account to start." )
-exist_user_label = tkinter.Label(main_window, font = ("Arial", 13), text = "Existing Users: " )
-new_user_label = tkinter.Label(main_window, font = ("Arial", 13),text = "New Users: " )
+Welcome_Label = tkinter.Label(main_window, font = ("Comic Sans ms", 15), text = "Welcome to Trailblazer")
+sub_welcome_label = tkinter.Label(main_window, font = ("Comic Sans ms", 10), text = "A Robotic Path Planning GUI!")
+informative_label = tkinter.Label(main_window,  font = ("Comic Sans ms", 8), text = "Please login or setup an account to start." )
+exist_user_label = tkinter.Label(main_window, font = ("Comic Sans ms", 13), text = "Existing Users: " )
+new_user_label = tkinter.Label(main_window, font = ("Comic Sans ms", 13),text = "New Users: " )
 login_button_main = tkinter.Button(main_window, text = "Login", background='light blue', command=login_window)               #Login button
 Set_button_main = tkinter.Button(main_window, 
                                     text = "Set Credentials",
@@ -157,8 +158,9 @@ exist_user_label.place(relx=0.5, rely=0.33, anchor='n')
 login_button_main.place(relx=0.5, rely=0.4, anchor='n')
 new_user_label.place(relx=0.5, rely=0.5, anchor='n')
 Set_button_main.place(relx=0.5, rely=0.57, anchor='n')
-Welcome_Label.place(relx=0.5, rely=0.1, anchor='n')
-informative_label.place(relx=0.5, rely=0.15, anchor='n')
+Welcome_Label.place(relx=0.5, rely=0.075, anchor='n')
+sub_welcome_label.place(relx=0.5, rely=0.15, anchor='n')
+informative_label.place(relx=0.5, rely=0.25, anchor='n')
 
 
 #Call the main window to start the program

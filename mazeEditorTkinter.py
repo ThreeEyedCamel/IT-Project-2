@@ -105,7 +105,8 @@ class MazeEditor(tk.Tk):
         self.button_label_import = tk.Label(self.button_frame, text="Import Maze")
         self.button_label_import.grid(row=1, column=6)
 
-        self.button_execute_algorithm = tk.Button(self.button_frame, text="Run Algorithm", command=self.execute_algorithm)
+        self.button_execute_algorithm = tk.Button(self.button_frame, text="Run Algorithm",
+                                                  command=self.execute_algorithm)
         self.button_execute_algorithm.grid(row=0, column=9, padx=5, pady=5)
 
         # Drop-down menu - courses
@@ -132,6 +133,9 @@ class MazeEditor(tk.Tk):
         path_image = path_image.resize((self.cell_size, self.cell_size), Image.Resampling.LANCZOS)
         path_image = ImageTk.PhotoImage(path_image)
         self.path_image = path_image
+
+        self.cyan_tile = ImageTk.PhotoImage(
+            Image.open(r"icons/cyan.png", ).resize((self.cell_size, self.cell_size), Image.Resampling.LANCZOS))
 
         print("--Debug-- init function complete")  # Debug
 
@@ -361,13 +365,11 @@ class MazeEditor(tk.Tk):
                     print(f"Skipping cell {coordinates} because it has the 'special' tag.")
                     return  # Skip drawing over this cell if it has the 'special' tag
 
-        self.canvas.create_rectangle(coordinates[0] * self.cell_size,
-                                     coordinates[1] * self.cell_size,
-                                     (coordinates[0] + 1) * self.cell_size,
-                                     (coordinates[1] + 1) * self.cell_size,
-                                     fill="grey", outline="grey",
-                                     tags=(f"cell_{coordinates[0]}_{coordinates[1]}", 'maze')
-                                     )
+        self.canvas.create_image(coordinates[0] * self.cell_size + self.cell_size // 2,
+                                 coordinates[1] * self.cell_size + self.cell_size // 2,
+                                 image=self.path_image,
+                                 tags=(f"cell_{coordinates[0]}_{coordinates[1]}", 'maze')
+                                 )
 
     def update_searched(self, coordinates):
         print(f"Searched cell ({coordinates})")
@@ -381,13 +383,18 @@ class MazeEditor(tk.Tk):
                     print(f"Skipping cell {coordinates} because it has the 'special' tag.")
                     return
 
-        self.canvas.create_rectangle(coordinates[0] * self.cell_size,
-                                     coordinates[1] * self.cell_size,
-                                     (coordinates[0] + 1) * self.cell_size,
-                                     (coordinates[1] + 1) * self.cell_size,
-                                     fill="cyan", outline="cyan",
-                                     tags=(f"cell_{coordinates[0]}_{coordinates[1]}", 'maze')
-                                     )
+        self.canvas.create_image(coordinates[0] * self.cell_size + self.cell_size // 2,
+                                 coordinates[1] * self.cell_size + self.cell_size // 2,
+                                 image=self.cyan_tile,
+                                 tags=(f"cell_{coordinates[0]}_{coordinates[1]}", 'maze')
+                                 )
+        # self.canvas.create_rectangle(coordinates[0] * self.cell_size,
+        #                              coordinates[1] * self.cell_size,
+        #                              (coordinates[0] + 1) * self.cell_size,
+        #                              (coordinates[1] + 1) * self.cell_size,
+        #                              fill="cyan", outline="cyan",
+        #                              tags=(f"cell_{coordinates[0]}_{coordinates[1]}", 'maze')
+        #                              )
 
     def animate_algorithm(self, explored_points_all, path):
         # Animate searched points
