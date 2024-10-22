@@ -274,7 +274,7 @@ class MazeEditor(tk.Tk):
         if 0 <= x < self.grid_width + 2 and 0 <= y < self.grid_height + 2:
             print(f"TERESA Drawing at coordinates: ({x}, {y})")  ##teresa debugging
             # Reset start/finish coords
-            if self.maze_matrix[y][x] == 2:
+            if self.maze_matrix[y][x] == 2:  #WHY IS THE MATRIX DONE Y< X NICKY
                 self.start_coords = (-1, -1)
             if self.maze_matrix[y][x] == 3:
                 self.finish_coords = (-1, -1)

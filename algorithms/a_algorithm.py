@@ -37,10 +37,9 @@ def valid(row, column):
 
 # Checks if the destination can be accessed - returns boolean
 #NICKY
-def unblocked(grid, column, row):
-    #print(f"CURRENT ROW COL{row},{column},{grid[row][column]}")
+def unblocked(grid, row, col): #BACKWARDS?
     
-    return grid[row][column] == 0 #TERESA 
+    return grid[row][col] != 1 #TERESA 
 
 
 # Checks if we have reached the destination
@@ -60,11 +59,11 @@ def trace_path(end, cell_details):
     path = []
     row, col = end
     while not (cell_details[row][col].p_row == row and cell_details[row][col].p_column == col):
-        path.append((col, row))
+        path.append((col, row))#BACKWARDS?
         temp_row = cell_details[row][col].p_row
         temp_col = cell_details[row][col].p_column
         row, col = temp_row, temp_col
-    path.append((col, row))  # Add the start node to the path
+    path.append((col, row))  # Add the start node to the path #BACKWARDS?
     return path[::-1]  # Reverse the path to get it from start to end
 
 def a_star(grid, start, end):
