@@ -1,4 +1,5 @@
 # updated 22 oct
+# TERERERERRERSA 
 
 from math import sqrt
 import heapq
@@ -8,9 +9,6 @@ import numpy as np
 
 class Cell:
     def __init__(self):
-        #NICKY BELOW
-        """self.p_row = 0  # Parent cell's row index
-        self.p_column = 0  # Parent cell's column index"""
         self.p_row = -1  # Parent cell's row index
         self.p_column = -1  # Parent cell's column index
         self.t_cost = float('inf')  # Total cost of the cell (g + h)
