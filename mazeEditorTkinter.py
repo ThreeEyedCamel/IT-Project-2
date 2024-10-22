@@ -327,7 +327,7 @@ class MazeEditor(tk.Tk):
                 print(self.finish_coords)
 
     def export_maze(self):
-        with open("savedCourses/wegsmaze.txt", "w") as maze_file:
+        with open("savedCourses/maze.txt", "w") as maze_file:
             for row in self.maze_matrix:
                 maze_file.write(str(row) + "\n")
                 print(row)
