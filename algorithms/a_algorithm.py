@@ -1,5 +1,5 @@
 #   A* Algorithm File
-#   Last Update: 22nd October 2024, 9:26 PM AEST
+#   Last Update: 24nd October 2024, 10:27 PM AEST
 #######################################################################################
 #   Authors: Teresa Chhabra & Dominique (Nicky) Gerrard
 #   Testing & Debugging Conducted by: Teresa Chhabra
