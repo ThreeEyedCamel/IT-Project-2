@@ -14,9 +14,9 @@ class MazeEditor(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Maze Editor")
-        # Changeable parameters
-        self.grid_width = 40  # Measured in cells
-        self.grid_height = 30
+        # Changeable parameters, measured in cells
+        self.grid_width = 40  # Width of grid
+        self.grid_height = 30 # Height of grid
         self.cell_size = 20  # Size of cells (smaller = more compressed)
         self.canvas_width = (self.grid_width + 2) * self.cell_size
         self.canvas_height = (self.grid_height + 2) * self.cell_size
@@ -151,6 +151,7 @@ class MazeEditor(tk.Tk):
         :param int matrix_height:
         """
         self.maze_matrix = [[0 for _ in range(matrix_width)] for _ in range(matrix_height)]
+        # Add boundary walls around the matrix
         for line in self.maze_matrix:
             line.insert(0, 1)
             line.append(1)
@@ -159,7 +160,9 @@ class MazeEditor(tk.Tk):
 
     def initialise_canvas(self):
         """
-        All details of canvas initialisation go in this function
+        All details of canvas initialisation go in this function.
+        This includes the background images and textures used. 
+        To customise the look of the GUI's background use this function. 
 
         :return:
         """
@@ -172,18 +175,22 @@ class MazeEditor(tk.Tk):
                                (x + 1) * self.cell_size,
                                (y + 1) * self.cell_size)
                 if self.maze_matrix[y][x] == 1:
-                    # Bush instead of black squares
+                    # Bush instead of black squares for obstacle cells
                     self.canvas.create_image(
                         x * self.cell_size + self.cell_size // 2,  # Center the image in the cell
                         y * self.cell_size + self.cell_size // 2,
                         image=self.bush_image,
                         tags=(f"cell_{x}_{y}", 'maze', 'special')
                     )
+                # Start point
                 if self.maze_matrix[y][x] == 2:
+                    # Start point is placed in green
                     self.canvas.create_rectangle(square_dims, fill="green", tags=(f"cell_{x}_{y}", 'maze', 'special'))
                     self.start_coords = (x, y)
                     print(f"start coord: {x},{y}")
+                # End point
                 if self.maze_matrix[y][x] == 3:
+                    # End point is in red 
                     self.canvas.create_rectangle(square_dims, fill="red", tags=(f"cell_{x}_{y}", 'maze', 'special'))
                     self.finish_coords = (x, y)
                     print(f"finish coord: {x},{y}")
@@ -193,30 +200,30 @@ class MazeEditor(tk.Tk):
         Connector between draw button and draw function.
         """
         print("draw mode")
-        if self.button_draw.config('relief')[-1] == 'sunken':
-            self.button_draw.config(relief="raised")
-            self.canvas.unbind("<B1-Motion>")
-            self.canvas.unbind("<Button-1>")
+        if self.button_draw.config('relief')[-1] == 'sunken':   # Checks if the draw button is currently active
+            self.button_draw.config(relief="raised")            # Deactivate draw mode
+            self.canvas.unbind("<B1-Motion>")                   # Unbind drawing with mouse
+            self.canvas.unbind("<Button-1>")                    # Unbind drawing on click
 
-        else:
-            self.raise_all_buttons()
-            self.button_draw.config(relief="sunken")
-            self.canvas.bind("<B1-Motion>", self.draw)
-            self.canvas.bind("<Button-1>", self.draw)
+        else:                                                   # Drawing active
+            self.raise_all_buttons()                            # All buttons should be raised
+            self.button_draw.config(relief="sunken")            # Make the draw button active
+            self.canvas.bind("<B1-Motion>", self.draw)          # Bind draw to motion
+            self.canvas.bind("<Button-1>", self.draw)           # Bind draw to click
 
     def place_start_mode(self):
         """
         Connector between place start button and place start function.
         """
         print("place start mode")
-        if self.button_place_start.config('relief')[-1] == 'sunken':
-            self.button_place_start.config(relief="raised")
+        if self.button_place_start.config('relief')[-1] == 'sunken':    # Checks if the start placement is active
+            self.button_place_start.config(relief="raised")             # Deactivate start placement
             self.canvas.unbind("<B1-Motion>")
             self.canvas.unbind("<Button-1>")
 
         else:
             self.raise_all_buttons()
-            self.button_place_start.config(relief="sunken")
+            self.button_place_start.config(relief="sunken")             # Set start placement as active
             self.canvas.bind("<B1-Motion>", self.place_start)
             self.canvas.bind("<Button-1>", self.place_start)
 
@@ -225,7 +232,7 @@ class MazeEditor(tk.Tk):
         Connector between place finish button and place finish function.
         """
         print("place finish mode")
-        if self.button_place_finish.config('relief')[-1] == 'sunken':
+        if self.button_place_finish.config('relief')[-1] == 'sunken':   # Set finish as active
             self.button_place_finish.config(relief="raised")
             self.canvas.unbind("<B1-Motion>")
             self.canvas.unbind("<Button-1>")
@@ -241,7 +248,7 @@ class MazeEditor(tk.Tk):
         Connector between erase button and erase function.
         """
         print("erase mode")
-        if self.button_erase.config('relief')[-1] == 'sunken':
+        if self.button_erase.config('relief')[-1] == 'sunken':     # Checks erase mode is active
             self.button_erase.config(relief="raised")
             self.canvas.unbind("<B1-Motion>")
             self.canvas.unbind("<Button-1>")
@@ -263,7 +270,7 @@ class MazeEditor(tk.Tk):
 
     def disable_buttons(self):
         """
-        Disables clickable buttons.
+        Disables clickable buttons during an operation
         """
         print("disable buttons")
         self.button_draw.config(state=tk.DISABLED)
@@ -278,7 +285,6 @@ class MazeEditor(tk.Tk):
     def enable_buttons(self):
         """
         Re-enables clickable buttons.
-        :return:
         """
         print("enable buttons")
         self.button_draw.config(state=tk.NORMAL)
@@ -294,19 +300,19 @@ class MazeEditor(tk.Tk):
         """
         Draws an obstacle at the clicked square.
 
-        :param event:
+        :param event: x and y coordinates on click
         """
-        x = event.x // self.cell_size
-        y = event.y // self.cell_size
+        x = event.x // self.cell_size   # Determine the cell x coordinate
+        y = event.y // self.cell_size   # Determine the cell Y coordinate
         if 0 <= x < self.grid_width + 2 and 0 <= y < self.grid_height + 2:
-            # Reset start/finish coords
+            # Reset start/finish coords (if for example they are drawn over)
             if self.maze_matrix[y][x] == 2:
                 self.start_coords = (-1, -1)
             if self.maze_matrix[y][x] == 3:
                 self.finish_coords = (-1, -1)
-            self.maze_matrix[y][x] = 1
+            self.maze_matrix[y][x] = 1  # Set cell as an obstacle
             self.canvas.create_image(
-                x * self.cell_size + self.cell_size // 2,  # Center the image in the cell
+                x * self.cell_size + self.cell_size // 2,  # Center the image in the cell horisontally and vertically
                 y * self.cell_size + self.cell_size // 2,
                 image=self.bush_image,
                 tags=(f"cell_{x}_{y}", 'maze', 'special')
@@ -316,12 +322,12 @@ class MazeEditor(tk.Tk):
         """
         Clears the tile at the clicked square.
 
-        :param event:
+        :param event: Mouse event providing x and y coordinates.
         """
         x = event.x // self.cell_size
         y = event.y // self.cell_size
         if 1 <= x < self.grid_width + 1 and 1 <= y < self.grid_height + 1:
-            # Reset start/finish coords
+            # Reset start/finish coords (if for example they are drawn over)
             if self.maze_matrix[y][x] == 2:
                 self.start_coords = (-1, -1)
             if self.maze_matrix[y][x] == 3:
@@ -333,14 +339,19 @@ class MazeEditor(tk.Tk):
         """
         Places a green square at the clicked tile.
 
-        :param event:
+        :param event: Mouse event containing x and y coordinates of the click.
         """
+        # Check if the start coordinates have not been set
         if (self.start_coords[0] < 0) and (self.start_coords[1] < 0):
+            # Convert click position to grid coordinates
             x = event.x // self.cell_size
             y = event.y // self.cell_size
+            # Ensure the click is within grid bounds
             if 1 <= x < self.grid_width + 1 and 1 <= y < self.grid_height + 1:
+                # Set the start position in the maze matrix
                 self.maze_matrix[y][x] = 2
                 self.start_coords = (x, y)
+                # Draw a green square on the canvas at the start position
                 self.canvas.create_rectangle(
                     x * self.cell_size,
                     y * self.cell_size,
@@ -349,20 +360,25 @@ class MazeEditor(tk.Tk):
                     fill="green",
                     tags=(f"cell_{x}_{y}", 'maze', 'special')
                 )
-                print(self.start_coords)
+                print(self.start_coords) # Debug print for start coordinates
 
     def place_finish(self, event):
         """
         Places a red square at the clicked tile.
 
-        :param event:
+        :param event: Mouse event containing x and y coordinates of the click.
         """
+        # Check if the finish coordinates have not been set
         if (self.finish_coords[0] < 0) and (self.finish_coords[1] < 0):
+            # Convert click position to grid coordinates
             x = event.x // self.cell_size
             y = event.y // self.cell_size
+            # Ensure the click is within grid bounds
             if 1 <= x < self.grid_width + 1 and 1 <= y < self.grid_height + 1:
+                # Set the finish position in the maze matrix
                 self.finish_coords = (x, y)
                 self.maze_matrix[y][x] = 3
+                # Draw a red square on the canvas at the finish position
                 self.canvas.create_rectangle(
                     x * self.cell_size,
                     y * self.cell_size,
@@ -371,7 +387,7 @@ class MazeEditor(tk.Tk):
                     fill="red",
                     tags=(f"cell_{x}_{y}", 'maze', 'special')
                 )
-                print(self.finish_coords)
+                print(self.finish_coords) # Debug print for finish coordinates
 
     def export_maze(self, path="maze.txt"):
         """
@@ -381,21 +397,20 @@ class MazeEditor(tk.Tk):
         """
         with open("savedCourses/" + path, "w") as maze_file:
             for row in self.maze_matrix:
-                maze_file.write(str(row) + "\n")
-                print(row)
+                maze_file.write(str(row) + "\n")  # Write each row of the maze to the file
+                print(row)  # Debug print for each row
 
     def clear_maze(self):
         """
         Clears the current obstacles
 
-        :return:
         """
-        print("cleared")
-        self.create_matrix(self.grid_width, self.grid_height)
-        self.canvas.delete("maze")
-        self.initialise_canvas()
-        self.start_coords = (-1, -1)
-        self.finish_coords = (-1, -1)
+        print("cleared") # Debug message
+        self.create_matrix(self.grid_width, self.grid_height)   # Reset maze matrix
+        self.canvas.delete("maze")  # Remove all maze elements from the canvas
+        self.initialise_canvas()  # Reinitialize the canvas
+        self.start_coords = (-1, -1)  # Reset the start coordinates
+        self.finish_coords = (-1, -1)  # Reset the finish coordinates
 
     def import_maze(self):
         """
@@ -410,14 +425,14 @@ class MazeEditor(tk.Tk):
                 #     print(int(sub.strip()))
                 integer_list = [int(sub.strip()) for sub in re.split(",", line[1:-2])]
                 self.maze_matrix.append(integer_list)
-        self.canvas.delete("all")
-        self.initialise_canvas()
+        self.canvas.delete("all")  # Clear the canvas
+        self.initialise_canvas()  # Reinitialize canvas with imported maze data
 
     def update_path(self, coordinates):
         """
         Creates a path tile on the specified coordinate
 
-        :param tuple coordinates:
+        :param tuple coordinates: Grid position of the path tile.
         """
         cell_tag = f"cell_{coordinates[0]}_{coordinates[1]}"
 
@@ -426,7 +441,7 @@ class MazeEditor(tk.Tk):
             for item in items:
                 if 'special' in self.canvas.gettags(item):
                     return  # Skip drawing over this cell if it has the 'special' tag
-
+        # Draw path on the canvas
         self.canvas.create_image(coordinates[0] * self.cell_size + self.cell_size // 2,
                                  coordinates[1] * self.cell_size + self.cell_size // 2,
                                  image=self.path_image,
@@ -437,7 +452,7 @@ class MazeEditor(tk.Tk):
         """
         Updates specified tile as translucent light blue.
 
-        :param tuple coordinates:
+        :param tuple coordinates: Grid position of the searched tile.
         """
         cell_tag = f"cell_{coordinates[0]}_{coordinates[1]}"
 
@@ -446,8 +461,8 @@ class MazeEditor(tk.Tk):
         if items:
             for item in items:
                 if 'special' in self.canvas.gettags(item):
-                    return
-
+                    return  # Skip if cell is marked as special
+        # Draw searched/looked at places on the canvas
         self.canvas.create_image(coordinates[0] * self.cell_size + self.cell_size // 2,
                                  coordinates[1] * self.cell_size + self.cell_size // 2,
                                  image=self.cyan_tile,
@@ -458,8 +473,8 @@ class MazeEditor(tk.Tk):
         """
         Animate algorithm.
 
-        :param list(tuple) explored_points_all:
-        :param list(tuple) path:
+        :param list(tuple) explored_points_all: All explored points by the algorithm.
+        :param list(tuple) path: The final path found by the algorithm.
         """
         self.animate_searched_points(explored_points_all, 0, path)
 
@@ -467,12 +482,12 @@ class MazeEditor(tk.Tk):
         """
         Animate searched points.
 
-        :param list(tuple) explored_points:
-        :param int index:
-        :param list(tuple) path:
+        :param list(tuple) explored_points: Points explored by the algorithm.
+        :param int index: Current index of explored points to display.
+        :param list(tuple) path: The final path found by the algorithm.
         """
         if index < len(explored_points):
-            self.update_searched(explored_points[index])
+            self.update_searched(explored_points[index])  # Show the searched tile
             self.after(self.animation_delay_views,
                        lambda: self.animate_searched_points(explored_points, index + 1, path))
         else:
@@ -483,19 +498,20 @@ class MazeEditor(tk.Tk):
         """
         Animate algorithm path.
 
-        :param list(int) path:
-        :param int index:
+        :param list(int) path: The sequence of grid coordinates forming the path.
+        :param int index: Current index in the path to display.
         """
         if index < len(path):
-            self.update_path(path[index])
+            self.update_path(path[index])   # Show the path
             self.after(self.animation_delay_moves, lambda: self.animate_path_algorithm(path, index + 1))
 
     def execute_algorithm(self):
         """
         Main function for executing algorithm, connects to buttons
         """
-        self.disable_buttons()
+        self.disable_buttons()  # Disable buttons during execution
 
+        # Check if start and finish points are defined
         if self.start_coords == (-1, -1) or self.finish_coords == (-1, -1):
             tkinter.messagebox.showerror("Error", "Start and/or Finish not found")
             print("No start and/or end found, exiting...")
@@ -503,6 +519,7 @@ class MazeEditor(tk.Tk):
             return None
 
         print(self.algo_variable.get())
+        # Load and execute the selected algorithm module
         algorithm_file_path = 'algorithms/' + self.algo_variable.get() + '.py'
         algorithm_module_name = self.algo_variable.get()
         print(algorithm_module_name)
@@ -526,7 +543,7 @@ class MazeEditor(tk.Tk):
             tkinter.messagebox.showerror("Error", "Algorithm function not found, please check your algorithm module.")
             print("No algorithm found, exiting...")
 
-        self.enable_buttons()
+        self.enable_buttons()  # Re-enable buttons
 
 
 if __name__ == "__main__":
