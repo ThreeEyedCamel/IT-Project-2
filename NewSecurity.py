@@ -1,13 +1,14 @@
-#https://www.youtube.com/watch?v=MeMCBdnhvQs
 import re
 import tkinter
 from tkinter import messagebox
 import mazeEditorTkinter
 import hashlib
-
+"""
+This function is the security function. 
+"""
 #Basic database to start with
 credentials = [['user', 'Password12345!'],
-               ['user2', 'Password12345!']
+               ['user2', 'Password67890!']
 ]
 
 #Function to hash/encrypt the passwords:
@@ -141,17 +142,13 @@ def credential_window():
 
 #Main window 
 #Define components
-Welcome_Label = tkinter.Label(main_window, font = ("Comic Sans ms", 15), text = "Welcome to Trailblazer")
-sub_welcome_label = tkinter.Label(main_window, font = ("Comic Sans ms", 10), text = "A Robotic Path Planning GUI!")
-informative_label = tkinter.Label(main_window,  font = ("Comic Sans ms", 8), text = "Please login or setup an account to start." )
-exist_user_label = tkinter.Label(main_window, font = ("Comic Sans ms", 13), text = "Existing Users: " )
-new_user_label = tkinter.Label(main_window, font = ("Comic Sans ms", 13),text = "New Users: " )
-login_button_main = tkinter.Button(main_window, text = "Login", background='light blue', command=login_window)               #Login button
-Set_button_main = tkinter.Button(main_window, 
-                                    text = "Set Credentials",
-                                    background='light blue',
-                                    command=credential_window
-                                    )  #Set credentials button
+Welcome_Label = tkinter.Label(main_window, font = ("Comic Sans ms", 15), text = "Welcome to Trailblazer")                          #Welcome label
+sub_welcome_label = tkinter.Label(main_window, font = ("Comic Sans ms", 10), text = "A Robotic Path Planning GUI!")                #App name label
+informative_label = tkinter.Label(main_window,  font = ("Comic Sans ms", 8), text = "Please login or setup an account to start." ) #Instructional label
+exist_user_label = tkinter.Label(main_window, font = ("Comic Sans ms", 13), text = "Existing Users: " )                            #Existing Users label
+new_user_label = tkinter.Label(main_window, font = ("Comic Sans ms", 13),text = "New Users: " )                                    #New Users label
+login_button_main = tkinter.Button(main_window, text = "Login", background='light blue', command=login_window)                     #Login button
+Set_button_main = tkinter.Button(main_window, text = "Set Credentials", background='light blue', command=credential_window)        #Set credentials button
 
 #Place components
 exist_user_label.place(relx=0.5, rely=0.33, anchor='n')
