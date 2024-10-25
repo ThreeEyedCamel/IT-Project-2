@@ -14,28 +14,28 @@ def algorithm(grid, start, end):
         sx = 1 if x1 < x2 else -1
         sy = 1 if y1 < y2 else -1
         err = dx - dy
-
+        # Continue while the current point isn't the destination
         while (x1, y1) != (x2, y2):
             if not is_free(x1, y1):
                 return False
             e2 = 2 * err
             if e2 > -dy:
-                err -= dy
-                x1 += sx
+                err -= dy # Update error based on Y movement
+                x1 += sx # Move a step in X direction
             if e2 < dx:
-                err += dx
-                y1 += sy
+                err += dx # Update error based on X movement
+                y1 += sy # Move a step in Y direction
         return is_free(x2, y2)
 
-    # Distance function
+    #D istance function to calculate the euclidean distance between two points 
     def distance(p1, p2):
         return np.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
 
     # RRT algorithm with smaller steps and collision checks along the path
     def rrt(maze, start, goal, max_iterations=10000, step_size=2, goal_bias=0.1):
-        tree = {start: None}  # Dictionary to store tree (point: parent)
-        points = [start]  # List of points in the tree
-        explored_points_all = []  # List to store ALL explored points
+        tree = {start: None}        # Dictionary to store tree (point: parent)
+        points = [start]            # List of points in the tree
+        explored_points_all = []    # List to store ALL explored points
 
         for iteration in range(max_iterations):
             # With some probability, sample the goal to bias the tree towards the goal
@@ -100,9 +100,11 @@ def algorithm(grid, start, end):
         plt.legend()
         plt.show()
 
+    # Ensuring the datatype of the maze is a numpy array
     def convert_maze(maze):
         return np.asarray(maze)
 
+    # Running the RRT function
     def run_rrt(maze):
         # Find the start and destination points
         start = tuple(map(int, np.argwhere(maze == 2)[0]))  # Start point (2)
@@ -120,6 +122,7 @@ def algorithm(grid, start, end):
         else:
             raise Exception("No path found.")
 
+    # Function to get the path
     def extract_path(tree, start, goal):
         path = [goal]
         current = goal
@@ -128,13 +131,14 @@ def algorithm(grid, start, end):
             path.append(current)
         return path[::-1]  # Reverse the path to go from start to goal
 
-    maze = convert_maze(grid)
-    path, explored_points_all = run_rrt(maze)
+    maze = convert_maze(grid) # Make the maze datatype numpy array
+    path, explored_points_all = run_rrt(maze) # Get the path and explored points
 
     for i in range(len(explored_points_all)):
-        explored_points_all[i] = explored_points_all[i][::-1]
+        explored_points_all[i] = explored_points_all[i][::-1] # Reverse x and y for final explored points/where the algorithm has looked
 
     for i in range(len(path)):
         path[i] = path[i][::-1]  # Reverse x and y for final path
 
+    # Return the path and all explored/looked at points 
     return path, explored_points_all
